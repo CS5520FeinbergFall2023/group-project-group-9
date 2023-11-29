@@ -30,10 +30,8 @@ public class Spotify {
     private static final String CLIENT_SECRET = "d418779f7c994c6683bf27b1a35f141b"; // store this somewhere else
     private String accessToken = "";
     private long tokenExpirationTime = 0;
-    private Context context;
 
-    public Spotify(Context context) {
-        this.context = context;
+    public Spotify() {
         checkAccessToken();
     }
 
@@ -75,7 +73,7 @@ public class Spotify {
                                 public void run() {
                                     accessToken = parseAccessToken(responseBody);
                                     tokenExpirationTime = calculateTokenExpirationTime(responseBody);
-                                    Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
+                                    // Toast.makeText(context, "Success!", Toast.LENGTH_SHORT).show();
                                 }
                             });
                         } else {
@@ -89,7 +87,7 @@ public class Spotify {
                 }
             }).start();
         } else {
-            Toast.makeText(context, "Token already exists: " + accessToken, Toast.LENGTH_SHORT).show();
+            // Toast.makeText(context, "Token already exists: " + accessToken, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -144,7 +142,7 @@ public class Spotify {
                     }
                 } else {
                     // No tracks found
-                    Toast.makeText(context, "No artists found", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(context, "No artists found", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 // Unexpected response format
@@ -208,7 +206,7 @@ public class Spotify {
                     }
                 } else {
                     // No tracks found
-                    Toast.makeText(context, "No tracks found", Toast.LENGTH_SHORT).show();
+                    // Toast.makeText(context, "No tracks found", Toast.LENGTH_SHORT).show();
                 }
             } else {
                 // Unexpected response format

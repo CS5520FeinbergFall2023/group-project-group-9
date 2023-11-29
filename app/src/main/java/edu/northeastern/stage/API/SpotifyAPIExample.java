@@ -18,7 +18,7 @@ public class SpotifyAPIExample extends AppCompatActivity {
 
     Button searchArtistBT;
     Button searchTrackBT;
-    Spotify spotify = new Spotify(SpotifyAPIExample.this);
+    Spotify spotify = new Spotify();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

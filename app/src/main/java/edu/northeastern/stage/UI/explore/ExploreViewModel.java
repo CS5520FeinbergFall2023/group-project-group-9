@@ -1,10 +1,13 @@
 package edu.northeastern.stage.UI.explore;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+
+import com.google.gson.JsonElement;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,40 +21,52 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
 
+import edu.northeastern.stage.API.Spotify;
 import edu.northeastern.stage.Model.Circle;
 import edu.northeastern.stage.R;
 
 public class ExploreViewModel extends AndroidViewModel {
 
-    private MutableLiveData<List<String>> recommendations = new MutableLiveData<>();
-    private MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
-    private MutableLiveData<String> selectedSong = new MutableLiveData<>();
+    private MutableLiveData<List<JsonElement>> recommendations = new MutableLiveData<>();
+    private MutableLiveData<JsonElement> selectedSong = new MutableLiveData<>();
     private static final Random rand = new Random();
+    private Spotify spotify = new Spotify();
     CircleView circleView;
     Map<Circle, String> circleTextMap = new HashMap<>();
     List<Circle> circles;
-
-
 
     public ExploreViewModel(Application application) {
         super(application);
     }
 
-    public LiveData<List<String>> getRecommendations() {
+    public LiveData<List<JsonElement>> getRecommendations() {
         return recommendations;
-    }
-
-    public LiveData<Boolean> getIsLoading() {
-        return isLoading;
     }
 
     public void searchTextChanged(String text) {
         if (text.isEmpty()) {
             recommendations.setValue(new ArrayList<>());
         } else {
-            makeDeezerReq(text);
+            performSearch(text);
         }
+    }
+
+    // Method to handle search logic
+    // in ExploreFragment, need to handle JsonElement by getting key/value pairs
+    private LiveData<List<JsonElement>> performSearch(String query) {
+        MutableLiveData<List<JsonElement>> searchResults = new MutableLiveData<>();
+
+        // change numResults
+        CompletableFuture<ArrayList<JsonElement>> trackSearchFuture = spotify.trackSearch(query,10);
+        trackSearchFuture.thenAccept(searchResult -> {
+            searchResults.postValue(searchResult);
+        }).exceptionally(e -> {
+            Log.e("TrackSearchError",e.getMessage());
+            return null;
+        });
+        return searchResults;
     }
 
     public void songSelected(String song) {
@@ -59,61 +74,9 @@ public class ExploreViewModel extends AndroidViewModel {
         // Any other logic related to song selection
     }
 
-    public LiveData<String> getSelectedSong() {
+    public LiveData<JsonElement> getSelectedSong() {
         return selectedSong;
     }
-
-    public void makeDeezerReq(String inputArtistName) {
-        String deezerApiKey = getApplication().getString(R.string.DEEZER_API);
-        isLoading.setValue(true);
-
-        new Thread(() -> {
-            try {
-                URL url = new URL(getApplication().getString(R.string.DEEZER_BASE_URL) + inputArtistName);
-                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setRequestProperty("X-RapidAPI-Key", deezerApiKey);
-                urlConnection.setRequestProperty("X-RapidAPI-Host", "deezerdevs-deezer.p.rapidapi.com");
-                urlConnection.setDoInput(true);
-                urlConnection.connect();
-
-                InputStream inputStream = urlConnection.getInputStream();
-                String jsonString = convertStreamToString(inputStream);
-                parseJsonAndUpdate(jsonString);
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                recommendations.postValue(new ArrayList<>());
-            } finally {
-                isLoading.postValue(false);
-            }
-        }).start();
-    }
-
-
-    private void parseJsonAndUpdate(String jsonString) {
-        try {
-            JSONObject response = new JSONObject(jsonString);
-            JSONArray data = response.getJSONArray("data");
-            List<String> tempRecs = new ArrayList<>();
-            for (int i = 0; i < data.length(); i++) {
-                JSONObject currentResult = data.getJSONObject(i);
-                JSONObject artist = currentResult.getJSONObject("artist");
-                String trackName = currentResult.getString("title");
-                String artistName = artist.getString("name");
-                tempRecs.add(trackName + " by " + artistName);
-            }
-            recommendations.postValue(tempRecs);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next().replace(",", ",\n") : "";
-    }
-
 
     public void setCircles(CircleView circleView) {
         // Process the circles as needed in the ViewModel
@@ -186,4 +149,55 @@ public class ExploreViewModel extends AndroidViewModel {
         return texts[randomIndex];
     }
 
+    // this portion is replaced with Spotify logic
+//    private void makeDeezerReq(String inputArtistName) {
+//        String deezerApiKey = getApplication().getString(R.string.DEEZER_API);
+//        isLoading.setValue(true);
+//
+//        new Thread(() -> {
+//            try {
+//                URL url = new URL(getApplication().getString(R.string.DEEZER_BASE_URL) + inputArtistName);
+//                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+//                urlConnection.setRequestMethod("GET");
+//                urlConnection.setRequestProperty("X-RapidAPI-Key", deezerApiKey);
+//                urlConnection.setRequestProperty("X-RapidAPI-Host", "deezerdevs-deezer.p.rapidapi.com");
+//                urlConnection.setDoInput(true);
+//                urlConnection.connect();
+//
+//                InputStream inputStream = urlConnection.getInputStream();
+//                String jsonString = convertStreamToString(inputStream);
+//                parseJsonAndUpdate(jsonString);
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                recommendations.postValue(new ArrayList<>());
+//            } finally {
+//                isLoading.postValue(false);
+//            }
+//        }).start();
+//    }
+//
+//
+//    private void parseJsonAndUpdate(String jsonString) {
+//        try {
+//            JSONObject response = new JSONObject(jsonString);
+//            JSONArray data = response.getJSONArray("data");
+//            List<String> tempRecs = new ArrayList<>();
+//            for (int i = 0; i < data.length(); i++) {
+//                JSONObject currentResult = data.getJSONObject(i);
+//                JSONObject artist = currentResult.getJSONObject("artist");
+//                String trackName = currentResult.getString("title");
+//                String artistName = artist.getString("name");
+//                tempRecs.add(trackName + " by " + artistName);
+//            }
+//            recommendations.postValue(tempRecs);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    private String convertStreamToString(InputStream is) {
+//        Scanner s = new Scanner(is).useDelimiter("\\A");
+//        return s.hasNext() ? s.next().replace(",", ",\n") : "";
+//    }
 }

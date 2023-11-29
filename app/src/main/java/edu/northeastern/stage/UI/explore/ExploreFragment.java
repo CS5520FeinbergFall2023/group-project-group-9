@@ -29,7 +29,6 @@ public class ExploreFragment extends Fragment {
     private ExploreViewModel viewModel;
     TextView progressTextView;
 
-
     TextWatcher textWatcher = new TextWatcher() {
 
         @Override
@@ -69,14 +68,16 @@ public class ExploreFragment extends Fragment {
         actv.addTextChangedListener(textWatcher);
         actv.setOnItemClickListener((parent, view, position, id) -> {
             String selectedSong = (String) parent.getItemAtPosition(position);
+            // TODO: why are we setting song selected if we aren't using this anywhere?
             viewModel.songSelected(selectedSong);
             buttonToMusicReview.setEnabled(true);
         });
 
-
         buttonToMusicReview.setOnClickListener(v -> {
             // Use the NavController to navigate to the MusicReviewFragment
             NavController navController = NavHostFragment.findNavController(ExploreFragment.this);
+            // TODO: when button is clicked, we should navigate to music review fragment but also create a Review object
+            // TODO: and pass it in somehow
             navController.navigate(R.id.action_navigation_explore_to_navigation_music_review);
         });
 
@@ -107,11 +108,10 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-
-
         return fragmentView;
     }
 
+    // TODO: need to use ArrayList<JsonElement> and create an adapter that contains not only the string values of tracks but also artist name
     private void observeViewModel() {
         viewModel.getRecommendations().observe(getViewLifecycleOwner(), recommendations -> {
             adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, recommendations);
