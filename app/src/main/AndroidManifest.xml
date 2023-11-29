@@ -5,18 +5,22 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- need to implement redirect URI for Spotify API -->
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"z
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.STAGE"
         tools:targetApi="31">
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -46,7 +50,27 @@
             android:name=".UI.profile.ProfileViewModel"
             android:exported="false">
         </activity>
+
+        <activity
+            android:name=".API.FirebaseExample"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".API.SpotifyAPIExample"
+            android:exported="true">
+        </activity>
+        <activity
+            android:name=".API.ResetPWDialogFragment"
+            android:exported="false" />
+        <activity
+            android:name=".API.Register"
+            android:exported="false" />
+        <activity
+            android:name=".API.Login"
+            android:exported="false" />
+        <activity
+            android:name=".API.LoginRegisterExample"
+            android:exported="false" />
     </application>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
 </manifest>
