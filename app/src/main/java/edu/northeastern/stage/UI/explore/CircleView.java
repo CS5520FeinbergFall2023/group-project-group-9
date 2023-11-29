@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.explore;
+package edu.northeastern.stage.UI.explore;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.northeastern.stage.model.Circle;
+import edu.northeastern.stage.Model.Circle;
 
 public class CircleView extends View {
 

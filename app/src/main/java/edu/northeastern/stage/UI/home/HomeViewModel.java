@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.home;
+package edu.northeastern.stage.UI.home;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import java.util.List;
 
-import edu.northeastern.stage.model.Post;
+import edu.northeastern.stage.Model.Post;
 
 public class HomeViewModel extends ViewModel {
 

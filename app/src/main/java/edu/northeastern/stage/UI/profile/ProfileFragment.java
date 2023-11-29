@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.profile;
+package edu.northeastern.stage.UI.profile;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.model.Post;
+import edu.northeastern.stage.Model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
 
 import android.content.Intent;

@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import edu.northeastern.stage.model.Post;
+import edu.northeastern.stage.Model.Post;
+import edu.northeastern.stage.R;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder> {
 

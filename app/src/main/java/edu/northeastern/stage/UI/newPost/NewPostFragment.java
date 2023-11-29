@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.newPost;
+package edu.northeastern.stage.UI.newPost;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.musicReview;
+package edu.northeastern.stage.UI.musicReview;
 
 import androidx.lifecycle.ViewModelProvider;
 
@@ -13,15 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import edu.northeastern.stage.R;
-import edu.northeastern.stage.ReviewAdapter;
+import edu.northeastern.stage.Adapter.ReviewAdapter;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 

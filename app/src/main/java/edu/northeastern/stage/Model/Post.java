@@ -1,4 +1,4 @@
-package edu.northeastern.stage.model;
+package edu.northeastern.stage.Model;
 
 public class Post {
     private String userAvatarUrl;

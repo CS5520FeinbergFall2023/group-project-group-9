@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.profile;
+package edu.northeastern.stage.UI.profile;
 
 import android.content.Context;
 import android.content.Intent;

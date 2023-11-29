@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.explore;
+package edu.northeastern.stage.UI.explore;
 
 import android.app.Application;
 
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
-import edu.northeastern.stage.model.Circle;
+import edu.northeastern.stage.Model.Circle;
 import edu.northeastern.stage.R;
 
 public class ExploreViewModel extends AndroidViewModel {

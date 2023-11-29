@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.home;
+package edu.northeastern.stage.UI.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
-import edu.northeastern.stage.PostAdapter;
+import edu.northeastern.stage.Adapter.PostAdapter;
 import edu.northeastern.stage.R;
 
 public class HomeFragment extends Fragment {

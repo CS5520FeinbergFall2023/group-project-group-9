@@ -1,4 +1,4 @@
-package edu.northeastern.stage.ui.explore;
+package edu.northeastern.stage.UI.explore;
 
 import android.os.Bundle;
 

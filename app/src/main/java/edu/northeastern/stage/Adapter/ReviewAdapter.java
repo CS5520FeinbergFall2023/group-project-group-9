@@ -1,4 +1,4 @@
-package edu.northeastern.stage;
+package edu.northeastern.stage.Adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-import edu.northeastern.stage.model.Review;
+import edu.northeastern.stage.Model.Review;
+import edu.northeastern.stage.R;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
     private List<Review> reviewList;

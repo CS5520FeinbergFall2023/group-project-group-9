@@ -33,7 +33,7 @@
         app:layout_constraintTop_toBottomOf="@+id/autoCompleteTextView"
         app:layout_constraintVertical_chainStyle="packed" />
 
-    <edu.northeastern.stage.ui.explore.CircleView
+    <edu.northeastern.stage.UI.explore.CircleView
         android:id="@+id/circleView"
         android:layout_width="329dp"
         android:layout_height="395dp"
