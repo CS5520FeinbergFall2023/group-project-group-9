@@ -24,6 +24,7 @@ import edu.northeastern.stage.model.Circle;
 public class CircleView extends View {
 
     // Constructor and circle list initialization
+    private static final float FRICTION = 0.98f;
     Circle[] circles;
     private Matrix matrix;
     private Paint paint;
@@ -189,6 +190,11 @@ public class CircleView extends View {
             // Update positions and check for collisions
             c1.setX(c1.getX() + velocities[i * 2]);
             c1.setY(c1.getY() + velocities[i * 2 + 1]);
+
+            // Apply friction to slow down gradually
+            velocities[i * 2] *= FRICTION;
+            velocities[i * 2 + 1] *= FRICTION;
+
             for (int j = i + 1; j < circles.length; j++) {
                 Circle c2 = circles[j];
                 handleCollision(c1, c2, i, j);
@@ -208,6 +214,8 @@ public class CircleView extends View {
         float dy = pos2[1] - pos1[1];
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
+        float overlap = (radius1 + radius2 - distance) + 3;
+
         if (distance < radius1 + radius2) {
             // Exchange velocities
             float tempVelX = velocities[index1 * 2];
@@ -220,7 +228,6 @@ public class CircleView extends View {
             velocities[index2 * 2 + 1] = tempVelY;
 
             // Move circles slightly away from each other to avoid sticking together
-            float overlap = 0.5f * ((radius1 + radius2) - distance);
             dx /= distance;
             dy /= distance;
 
@@ -230,9 +237,11 @@ public class CircleView extends View {
             c2.setX(c2.getX() + overlap * dx);
             c2.setY(c2.getY() + overlap * dy);
         }
+
         float newDx = c2.getX() - c1.getX();
         float newDy = c2.getY() - c1.getY();
         float newDistance = (float) Math.sqrt(newDx * newDx + newDy * newDy);
+
         if (newDistance < radius1 + radius2) {
             float tempVelX = velocities[index1 * 2];
             float tempVelY = velocities[index1 * 2 + 1];
@@ -244,7 +253,6 @@ public class CircleView extends View {
             velocities[index2 * 2 + 1] = tempVelY;
 
             // Move circles slightly away from each other to avoid sticking together
-            float overlap = 0.5f * ((radius1 + radius2) - distance);
             newDx /= distance;
             newDy /= distance;
 
