@@ -122,7 +122,7 @@ public class CircleView extends View {
 
         velocities = new float[circles.length * 2]; // x and y velocities for each circle
         // Update circle positions based on velocities
-//        updateCirclePositions(canvas);
+        updateCirclePositions(canvas);
 
         canvas.save();
         canvas.concat(matrix);
@@ -142,45 +142,67 @@ public class CircleView extends View {
 //        postInvalidate();
     }
 
-    private void updateCirclePositions(Canvas canvas) {
+    private float[] transformPoint(float x, float y) {
+        float[] point = new float[]{x, y};
+        matrix.mapPoints(point);
+        return point;
+    }
 
-        //moving and also bouncing off of each other
+    private void enforceBoundary(Circle circle) {
+        float[] transformed = transformPoint(circle.getX(), circle.getY());
+        float radius = circle.getRadius() * scaleFactor;
+
+        // Check boundaries and adjust position if needed
+        if (transformed[0] - radius < 0) {
+            circle.setX(circle.getX() + (radius - transformed[0]));
+        } else if (transformed[0] + radius > getWidth()) {
+            circle.setX(circle.getX() - (transformed[0] + radius - getWidth()));
+        }
+
+        if (transformed[1] - radius < 0) {
+            circle.setY(circle.getY() + (radius - transformed[1]));
+        } else if (transformed[1] + radius > getHeight()) {
+            circle.setY(circle.getY() - (transformed[1] + radius - getHeight()));
+        }
+    }
+
+    private void updateCirclePositions(Canvas canvas) {
         for (int i = 0; i < circles.length; i++) {
             Circle c1 = circles[i];
-            //Move first
             c1.move(canvas);
-            //Draw them
-//            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
 
-//            Update circle position based on velocity
+            // Transform coordinates to consider current zoom level and pan
+            float[] transformed = transformPoint(c1.getX(), c1.getY());
+
+            // Boundary check with transformed coordinates
+            if (transformed[0] - c1.getRadius() < 0 ||
+                    transformed[0] + c1.getRadius() > getWidth() * scaleFactor ||
+                    transformed[1] - c1.getRadius() < 0 ||
+                    transformed[1] + c1.getRadius() > getHeight() * scaleFactor) {
+                velocities[i * 2] *= -1; // Flip x velocity
+                velocities[i * 2 + 1] *= -1; // Flip y velocity
+            }
+
+            // Enforce boundary constraints
+            enforceBoundary(c1);
+
+            // Update positions and check for collisions
             c1.setX(c1.getX() + velocities[i * 2]);
             c1.setY(c1.getY() + velocities[i * 2 + 1]);
-
-            // Boundary check
-            if(c1.getX() - c1.getRadius() < 0 ||
-                    c1.getX() + c1.getRadius() > getWidth()) {
-                // Flip x velocity
-                velocities[i*2] *= -1;
-            }
-
-            if(c1.getY() - c1.getRadius() < 0 ||
-                    c1.getY() + c1.getRadius() > getHeight()) {
-                // Flip y velocity
-                velocities[i*2 + 1] *= -1;
-            }
-
-            // Check for collisions with other circles
             for (int j = i + 1; j < circles.length; j++) {
                 Circle c2 = circles[j];
-                handleCollision(c1, c2, i, j, canvas);
+                handleCollision(c1, c2, i, j);
             }
         }
         invalidate();
     }
 
-    private void handleCollision(Circle c1, Circle c2, int index1, int index2, Canvas canvas) {
-        float dx = c2.getX() - c1.getX();
-        float dy = c2.getY() - c1.getY();
+    private void handleCollision(Circle c1, Circle c2, int index1, int index2) {
+        float[] pos1 = transformPoint(c1.getX(), c1.getY());
+        float[] pos2 = transformPoint(c2.getX(), c2.getY());
+
+        float dx = pos2[0] - pos1[0];
+        float dy = pos2[1] - pos1[1];
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (distance < c1.getRadius() + c2.getRadius()) {
