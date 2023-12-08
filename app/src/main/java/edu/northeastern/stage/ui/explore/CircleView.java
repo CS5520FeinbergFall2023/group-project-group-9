@@ -209,32 +209,50 @@ public class CircleView extends View {
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
         if (distance < radius1 + radius2) {
-            // Circles are colliding, adjust their velocities for bouncing effect
-            float angle = (float) Math.atan2(dy, dx);
-            float cosAngle = (float) Math.cos(angle);
-            float sinAngle = (float) Math.sin(angle);
+            // Exchange velocities
+            float tempVelX = velocities[index1 * 2];
+            float tempVelY = velocities[index1 * 2 + 1];
 
-            // Calculate new velocities for both circles
-            float v1n = velocities[index1 * 2] * cosAngle + velocities[index1 * 2 + 1] * sinAngle;
-            float v1t = -velocities[index1 * 2] * sinAngle + velocities[index1 * 2 + 1] * cosAngle;
+            velocities[index1 * 2] = velocities[index2 * 2];
+            velocities[index1 * 2 + 1] = velocities[index2 * 2 + 1];
 
-            float v2n = velocities[index2 * 2] * cosAngle + velocities[index2 * 2 + 1] * sinAngle;
-            float v2t = -velocities[index2 * 2] * sinAngle + velocities[index2 * 2 + 1] * cosAngle;
+            velocities[index2 * 2] = tempVelX;
+            velocities[index2 * 2 + 1] = tempVelY;
 
-            // Swap normal velocities (bounce off each other)
-            velocities[index1 * 2] = v2n * cosAngle - v1t * sinAngle;
-            velocities[index1 * 2 + 1] = v2n * sinAngle + v1t * cosAngle;
+            // Move circles slightly away from each other to avoid sticking together
+            float overlap = 0.5f * ((radius1 + radius2) - distance);
+            dx /= distance;
+            dy /= distance;
 
-            velocities[index2 * 2] = v1n * cosAngle - v2t * sinAngle;
-            velocities[index2 * 2 + 1] = v1n * sinAngle + v2t * cosAngle;
+            c1.setX(c1.getX() - overlap * dx);
+            c1.setY(c1.getY() - overlap * dy);
 
-            // Move circles slightly away to avoid continuous collisions
-            float overlap = (c1.getRadius() + c2.getRadius() - distance) / 2;
-            c1.setX(c1.getX() - overlap * cosAngle);
-            c1.setY(c1.getY() - overlap * sinAngle);
+            c2.setX(c2.getX() + overlap * dx);
+            c2.setY(c2.getY() + overlap * dy);
+        }
+        float newDx = c2.getX() - c1.getX();
+        float newDy = c2.getY() - c1.getY();
+        float newDistance = (float) Math.sqrt(newDx * newDx + newDy * newDy);
+        if (newDistance < radius1 + radius2) {
+            float tempVelX = velocities[index1 * 2];
+            float tempVelY = velocities[index1 * 2 + 1];
 
-            c2.setX(c2.getX() + overlap * cosAngle);
-            c2.setY(c2.getY() + overlap * sinAngle);
+            velocities[index1 * 2] = velocities[index2 * 2];
+            velocities[index1 * 2 + 1] = velocities[index2 * 2 + 1];
+
+            velocities[index2 * 2] = tempVelX;
+            velocities[index2 * 2 + 1] = tempVelY;
+
+            // Move circles slightly away from each other to avoid sticking together
+            float overlap = 0.5f * ((radius1 + radius2) - distance);
+            newDx /= distance;
+            newDy /= distance;
+
+            c1.setX(c1.getX() - overlap * newDx);
+            c1.setY(c1.getY() - overlap * newDy);
+
+            c2.setX(c2.getX() + overlap * newDx);
+            c2.setY(c2.getY() + overlap * newDy);
         }
     }
 
