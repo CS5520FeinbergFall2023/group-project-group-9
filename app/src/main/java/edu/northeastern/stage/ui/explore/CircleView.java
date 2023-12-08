@@ -149,21 +149,26 @@ public class CircleView extends View {
         return point;
     }
 
-    private void enforceBoundary(Circle circle) {
+    private void enforceBoundary(Circle circle, int index) {
         float[] transformed = transformPoint(circle.getX(), circle.getY());
         float radius = circle.getRadius() * scaleFactor;
 
-        // Check boundaries and adjust position if needed
+        // Check left and right boundaries
         if (transformed[0] - radius < 0) {
-            circle.setX(circle.getX() + (radius - transformed[0]));
+            circle.setX(circle.getX() + (0 - (transformed[0] - radius)));
+            velocities[index * 2] *= -1; // Reverse x velocity
         } else if (transformed[0] + radius > getWidth()) {
-            circle.setX(circle.getX() - (transformed[0] + radius - getWidth()));
+            circle.setX(circle.getX() - ((transformed[0] + radius) - getWidth()));
+            velocities[index * 2] *= -1; // Reverse x velocity
         }
 
+        // Check top and bottom boundaries
         if (transformed[1] - radius < 0) {
-            circle.setY(circle.getY() + (radius - transformed[1]));
+            circle.setY(circle.getY() + (0 - (transformed[1] - radius)));
+            velocities[index * 2 + 1] *= -1; // Reverse y velocity
         } else if (transformed[1] + radius > getHeight()) {
-            circle.setY(circle.getY() - (transformed[1] + radius - getHeight()));
+            circle.setY(circle.getY() - ((transformed[1] + radius) - getHeight()));
+            velocities[index * 2 + 1] *= -1; // Reverse y velocity
         }
     }
 
@@ -172,29 +177,18 @@ public class CircleView extends View {
             Circle c1 = circles[i];
             c1.move(canvas);
 
-            // Transform coordinates to consider current zoom level and pan
-            float[] transformed = transformPoint(c1.getX(), c1.getY());
-
-            // Boundary check with transformed coordinates
-            if (transformed[0] - c1.getRadius() < 0 ||
-                    transformed[0] + c1.getRadius() > getWidth() * scaleFactor ||
-                    transformed[1] - c1.getRadius() < 0 ||
-                    transformed[1] + c1.getRadius() > getHeight() * scaleFactor) {
-                velocities[i * 2] *= -1; // Flip x velocity
-                velocities[i * 2 + 1] *= -1; // Flip y velocity
-            }
-
-            // Enforce boundary constraints
-            enforceBoundary(c1);
-
-            // Update positions and check for collisions
+            // Update positions
             c1.setX(c1.getX() + velocities[i * 2]);
             c1.setY(c1.getY() + velocities[i * 2 + 1]);
 
-            // Apply friction to slow down gradually
-            velocities[i * 2] *= FRICTION;
-            velocities[i * 2 + 1] *= FRICTION;
+            // Enforce boundary constraints and reverse direction if needed
+            enforceBoundary(c1, i);
 
+            // Apply friction to slow down gradually
+//            velocities[i * 2] *= FRICTION;
+//            velocities[i * 2 + 1] *= FRICTION;
+
+            // Check for collisions with other circles
             for (int j = i + 1; j < circles.length; j++) {
                 Circle c2 = circles[j];
                 handleCollision(c1, c2, i, j);
