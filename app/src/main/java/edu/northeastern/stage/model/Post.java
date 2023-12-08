@@ -2,6 +2,7 @@ package edu.northeastern.stage.model;
 
 public class Post {
 
+    // TODO: random
     private String postID;
     private String ownerID;
     private String trackName;
