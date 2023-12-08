@@ -201,11 +201,14 @@ public class CircleView extends View {
         float[] pos1 = transformPoint(c1.getX(), c1.getY());
         float[] pos2 = transformPoint(c2.getX(), c2.getY());
 
+        float radius1 = c1.getRadius() * scaleFactor;
+        float radius2 = c2.getRadius() * scaleFactor;
+
         float dx = pos2[0] - pos1[0];
         float dy = pos2[1] - pos1[1];
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < c1.getRadius() + c2.getRadius()) {
+        if (distance < radius1 + radius2) {
             // Circles are colliding, adjust their velocities for bouncing effect
             float angle = (float) Math.atan2(dy, dx);
             float cosAngle = (float) Math.cos(angle);
