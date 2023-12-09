@@ -26,6 +26,10 @@ public class CustomBackStack {
         return stack.peekLast(); // Return the bottom element without removing
     }
 
+    public void remove(String fragmentTag) {
+        stack.remove(fragmentTag);
+    }
+
     public boolean isEmpty() {
         return stack.isEmpty();
     }

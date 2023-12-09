@@ -237,6 +237,10 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void removeFragmentFromBackStack(String tag) {
+        customBackStack.remove(tag);
+    }
+
     private void handleReselection(int itemId) {
         if (itemId == R.id.navigation_explore) {
             if (customBackStack.peekFirst().equalsIgnoreCase("MUSIC_REVIEW_FRAGMENT")) {

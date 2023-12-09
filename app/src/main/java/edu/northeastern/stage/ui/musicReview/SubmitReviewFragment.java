@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.Toast;
 
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Review;
 import edu.northeastern.stage.ui.viewmodels.MusicReviewViewModel;
@@ -76,11 +77,13 @@ public class SubmitReviewFragment extends Fragment {
             reviewRatingBar.setRating(0);
 
             // Remove submit review page from the back stack then navigate back to music review page
-            NavOptions navOptions = new NavOptions.Builder()
-                    .setPopUpTo(R.id.navigation_music_review, true)
-                    .build();
-            NavController navController = NavHostFragment.findNavController(SubmitReviewFragment.this);
-            navController.navigate(R.id.action_navigation_submit_review_to_navigation_music_review, null, navOptions);
+//            NavOptions navOptions = new NavOptions.Builder()
+//                    .setPopUpTo(R.id.navigation_music_review, true)
+//                    .build();
+//            NavController navController = NavHostFragment.findNavController(SubmitReviewFragment.this);
+//            navController.navigate(R.id.action_navigation_submit_review_to_navigation_music_review, null, navOptions);
+            ((MainActivity)requireActivity()).removeFragmentFromBackStack("SUBMIT_REVIEW_FRAGMENT");
+            ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
         }
     }
 }
