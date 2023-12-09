@@ -25,17 +25,60 @@ import edu.northeastern.stage.model.Post;
 
 public class ProfileViewModel extends ViewModel {
     private MutableLiveData<Boolean> dataRetrieved = new MutableLiveData<>();
+    private MutableLiveData<Boolean> followedStatus = new MutableLiveData<>();
+    private boolean isFollowing;
+    private boolean isFollowed;
     private Integer profilePicResource;
     private String description;
     private String email;
     private List<Post> posts = new ArrayList<>();
-    private List<String> recentlyListenedToImageURLs;
-    private List<String> tags;
+    private List<String> recentlyListenedToImageURLs = new ArrayList<>();
+    private List<String> tags = new ArrayList<>();
     private String currentID;
     private String profileOwnerID;
 
+    public void followStatus() {
+
+        if(currentID != null && profileOwnerID != null) {
+            FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+            DatabaseReference rootRef = mDatabase.getReference();
+            DatabaseReference currentUserRef = rootRef.child("users").child(currentID).child("following").child(profileOwnerID);
+            DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerID).child("followers").child(currentID);
+
+            currentUserRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        setIsFollowing(true);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+
+            profileOwnerRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if(snapshot.exists()) {
+                        setIsFollowed(true);
+                    }
+                }
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                }
+            });
+            followedStatus.setValue(isFollowing && isFollowed);
+        }
+
+    }
+
     public LiveData<Boolean> getDataRetrievedStatus() {
         return dataRetrieved;
+    }
+
+    public LiveData<Boolean> getFollowedStatus() {
+        return followedStatus;
     }
 
     public void retrieveDataFromDatabase() {
@@ -56,8 +99,9 @@ public class ProfileViewModel extends ViewModel {
                         setEmail(snapshot.child("email").getValue(String.class));
                     }
                     if(snapshot.hasChild("tags")) {
-                        for (DataSnapshot tagsSnapshot : snapshot.child("tags").getChildren()) {
-                            String tag = tagsSnapshot.getValue(String.class);
+                        DataSnapshot tagsSnapshot = snapshot.child("tags");
+                        for (DataSnapshot tagDataSnapshot : tagsSnapshot.getChildren()) {
+                            String tag = tagDataSnapshot.getKey();
                             tags.add(tag);
                         }
                     }
@@ -81,6 +125,9 @@ public class ProfileViewModel extends ViewModel {
                                 return Long.compare(o2.getTimestamp(), o1.getTimestamp());
                             }
                         });
+                        for(Post post : posts) {
+                            recentlyListenedToImageURLs.add(post.getImageURL());
+                        }
                     }
                 }
                 dataRetrieved.setValue(true);
@@ -131,12 +178,28 @@ public class ProfileViewModel extends ViewModel {
         profileOwnerRef.setValue(true);
     }
 
+
+    private void setIsFollowing(boolean following) {
+        isFollowing = following;
+    }
+
+    private void setIsFollowed(boolean followed) {
+        isFollowed = followed;
+    }
+
     public Integer getProfilePicResource() {
         return profilePicResource;
     }
 
     public void setProfilePicResource(Integer profilePicResource) {
         this.profilePicResource = profilePicResource;
+    }
+
+    public void reset() {
+        setPosts(new ArrayList<>());
+        setRecentlyListenedToImageURLs(new ArrayList<>());
+        setTags(new ArrayList<>());
+        dataRetrieved.setValue(false);
     }
 
     public List<Post> getPosts() {

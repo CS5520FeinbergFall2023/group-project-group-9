@@ -81,7 +81,7 @@ public class MusicReviewFragment extends Fragment {
             if (track != null) {
                 mViewModel.setTrack(track);
 
-                updateMusicAttributes(track.getAlbum().getName(), track.getAlbum().getReleaseDate(), track.getArtists().get(0).getGenres() !=null ? String.valueOf(track.getArtists().get(0).getGenres()) : "N/A");
+                updateMusicAttributes(track.getAlbum().getName(), track.getAlbum().getReleaseDate());
 
                 updateMusicTitle(track.getName(), track.getArtists());
 
@@ -156,10 +156,10 @@ public class MusicReviewFragment extends Fragment {
         }
     }
 
-    private void updateMusicAttributes(String album, String releaseDate, String genre) {
+    private void updateMusicAttributes(String album, String releaseDate) {
         String attributesText = String.format(Locale.getDefault(),
-                "Album: %s\nReleased: %s\nGenre: %s",
-                album, releaseDate, genre);
+                "Album: %s\nReleased: %s",
+                album, releaseDate);
 
         musicAttributesTextView.setText(attributesText);
     }

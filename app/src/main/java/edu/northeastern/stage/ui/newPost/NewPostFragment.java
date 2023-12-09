@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentNewPostBinding;
 import edu.northeastern.stage.model.music.Track;
@@ -98,13 +99,15 @@ public class NewPostFragment extends Fragment {
                 viewModel.createPost(postContent, visibilityState);
                 Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
 
-                NavOptions navOptions = new NavOptions.Builder()
-                        .setPopUpTo(R.id.navigation_new_post, true)
-                        .build();
+//                NavOptions navOptions = new NavOptions.Builder()
+//                        .setPopUpTo(R.id.navigation_new_post, true)
+//                        .build();
 
-                // Navigate using the configured NavOptions
-                NavController navController = NavHostFragment.findNavController(NewPostFragment.this);
-                navController.navigate(R.id.action_navigation_new_post_to_navigation_home, null, navOptions);
+                // Navigate to home after submission
+//                NavController navController = NavHostFragment.findNavController(NewPostFragment.this);
+//                navController.navigate(R.id.action_navigation_new_post_to_navigation_home, null, navOptions);
+                ((MainActivity)requireActivity()).removeFragmentFromBackStack("NEW_POST_FRAGMENT");
+                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true);
             }
         });
 

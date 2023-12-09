@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,11 +18,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-
 import edu.northeastern.stage.R;
 
 public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {

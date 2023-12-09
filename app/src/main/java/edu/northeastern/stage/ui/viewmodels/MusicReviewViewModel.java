@@ -43,14 +43,13 @@ public class MusicReviewViewModel extends ViewModel {
                     DataSnapshot reviewsSnapshot = user.child("reviews");
 
                     for (DataSnapshot reviewSnapshot : reviewsSnapshot.getChildren()) {
-                        if (reviewSnapshot.child("trackID").getValue().toString().equals(track.getId())) {
-                            Review review = new Review(userID,
-                                    reviewSnapshot.child("content").getValue().toString(),
-                                    Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
-                                    Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
-                                    reviewSnapshot.child("trackID").getValue().toString());
-                            currentReviews.add(review);
-                        }
+                        String reviewUserID = reviewSnapshot.child("userID").getValue(String.class); // Get the userID for each review
+                        Review review = new Review(reviewUserID,
+                                reviewSnapshot.child("content").getValue().toString(),
+                                Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
+                                Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
+                                reviewSnapshot.child("trackID").getValue().toString());
+                        currentReviews.add(review);
                     }
                 }
 

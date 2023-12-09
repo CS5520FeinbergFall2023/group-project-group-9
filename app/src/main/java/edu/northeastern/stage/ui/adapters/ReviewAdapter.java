@@ -8,6 +8,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -19,9 +25,11 @@ import edu.northeastern.stage.model.Review;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
     private List<Review> reviewList;
+    private FirebaseDatabase mDatabase;
 
     public ReviewAdapter(List<Review> reviewList) {
         this.reviewList = reviewList;
+        this.mDatabase = FirebaseDatabase.getInstance();
     }
 
     @NonNull
@@ -34,7 +42,26 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
     @Override
     public void onBindViewHolder(@NonNull ReviewViewHolder holder, int position) {
         Review review = reviewList.get(position);
-        holder.userIdTextView.setText(review.getUserID());
+        String userId = review.getUserID();
+        // Fetch profile picture resource and set it
+        DatabaseReference userRef = mDatabase
+                .getReference("users")
+                .child(review.getUserID())
+                .child("profilePicResource");
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    holder.avatarImageView.setImageResource(Integer.parseInt(snapshot.getValue().toString()));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle errors here
+            }
+        });
+        holder.userIdTextView.setText(userId);
         holder.contentTextView.setText(review.getContent());
         holder.ratingTextView.setText(String.valueOf(review.getRating()));
         Instant instant = Instant.ofEpochMilli(review.getTimestamp());

@@ -75,4 +75,9 @@ public class TagsAdapter_EditProfile extends RecyclerView.Adapter<TagsAdapter_Ed
         notifyItemRemoved(position);
         notifyItemRangeChanged(position, tagsList.size());
     }
+
+    public void setTags(List<String> tags) {
+        this.tagsList = tags;
+        notifyDataSetChanged();
+    }
 }

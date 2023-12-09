@@ -24,20 +24,34 @@
                 android:scaleType="fitCenter"
                 android:src="@drawable/ic_ablum_bob_dylan" />
 
-            <TextView
-                android:id="@+id/musicTitleTextView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:drawableEnd="@drawable/ic_favorite_black_24dp"
-                android:gravity="center"
-                android:padding="16dp"
-                android:text="Hurricane by Bob Dylan" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
 
-            <ImageView
-                android:id="@+id/spotifyLogo"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                app:srcCompat="@drawable/spotifylogo"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/musicTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:padding="16dp"
+                        android:text="Hurricane by Bob Dylan" />
+
+                    <ImageView
+                        android:id="@+id/spotifyLogo"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="16dp"
+                        android:layout_centerVertical="true"
+                        app:srcCompat="@drawable/spotifylogo" />
+                </RelativeLayout>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/musicAttributesTextView"

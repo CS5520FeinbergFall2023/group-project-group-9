@@ -39,6 +39,22 @@
             app:layout_constraintTop_toTopOf="@+id/userName"
             app:layout_constraintVertical_bias="0.5" />
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/unfollowButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-unfollow"
+            android:textSize="13sp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            style="@style/LightButton"
+            app:layout_constraintBottom_toBottomOf="@+id/userName"
+            app:layout_constraintHorizontal_bias="0.13"
+            app:layout_constraintLeft_toRightOf="@+id/userName"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/userName"
+            app:layout_constraintVertical_bias="0.5" />
+
         <Button
             android:id="@+id/editProfileButton"
             android:layout_width="14dp"

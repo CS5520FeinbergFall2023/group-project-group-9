@@ -1,6 +1,5 @@
 package edu.northeastern.stage.ui.profile;
 
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
 import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter;
-import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
 import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -31,17 +29,7 @@ import android.content.Intent;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class ProfileFragment extends Fragment {
@@ -52,119 +40,93 @@ public class ProfileFragment extends Fragment {
     private TagsAdapter tagsAdapter;
     private PostAdapter postsAdapter;
     private RecentListenedAdapter recentListenedAdapter;
-    private String currentUserId;
     private String profileOwnerId;
-    private Integer profilePictureResource;
-    private String email;
-    private String description;
     private List<Post> posts;
-    private List<String> tags;
     private List<String> recentlyListenedToImageURLs;
-    private boolean isFollowing;
 
+    // TODO: need to set onClick for follow/unfollow button
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
 
         // initialize view models
-        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
-        sharedDataViewModel = new ViewModelProvider(this).get(SharedDataViewModel.class);
+        viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
+        sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
 
         // get current user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
             if (userID != null) {
-                currentUserId = userID;
+                Bundle arguments = getArguments();
+                if(arguments != null && arguments.getString("PROFILE_OWNER_ID") != null) {
+                    profileOwnerId = arguments.getString("PROFILE_OWNER_ID");
+                } else {
+                    profileOwnerId = userID;
+                }
+
+                // set profile owner ID and current ID in the viewmodel
+                viewModel.setProfileOwnerID(profileOwnerId);
+                viewModel.setCurrentID(userID);
+
+                // set up adapters
+                setUpAdapters();
+
+                // retrieve all values from database first
+                viewModel.retrieveDataFromDatabase();
+
+                // data retrieved status
+                viewModel.getDataRetrievedStatus().observe(getViewLifecycleOwner(),dataRetrieved -> {
+                    if(dataRetrieved) {
+                        posts = viewModel.getPosts();
+                        setUIValues();
+
+                        // initiate follow status
+                        viewModel.followStatus();
+
+                        // update adapters
+                        tagsAdapter.setTags(viewModel.getTags());
+                        tagsAdapter.notifyDataSetChanged();
+                        postsAdapter.setPosts(viewModel.getPosts());
+                        postsAdapter.notifyDataSetChanged();
+                        recentListenedAdapter.setImageUrls(viewModel.getRecentlyListenedToImageURLs());
+                        recentListenedAdapter.notifyDataSetChanged();
+                    }
+                });
+
+                // get followed status
+                viewModel.getFollowedStatus().observe(getViewLifecycleOwner(), followedStatus -> {
+                    // true = following this profile owner
+                    // false = not following this profile owner
+                    showEditProfileButtonOrFollowButton(followedStatus);
+                });
+
+
             }
         });
 
-        // if landed on fragment by clicking on another fragment, get profile owner
-        if(getArguments().getString("PROFILE_OWNER_ID") != null && !getArguments().getString("PROFILE_OWNER_URL").isEmpty()) {
-            profileOwnerId = getArguments().getString("PROFILE_OWNER_ID");
-        } else {
-            profileOwnerId = currentUserId;
-        }
-
-        // set up adapters
-        setUpAdapters();
-
-        // show edit button
-        // or follow/unFollow button depending on profile owner and current user
-        showEditProfileButtonOrFollowButton();
-
         // initialize variables
-        tags = new ArrayList<>();
         posts = new ArrayList<>();
         recentlyListenedToImageURLs = new ArrayList<>();
-
-        // retrieve all values from database first
-        retrieveDataFromDatabase();
-
-        // set values to UI
-        setUIValues();
 
         return binding.getRoot();
     }
 
-    private void retrieveDataFromDatabase() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference userRef = rootRef.child("users").child(profileOwnerId);
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()) {
-                    if(snapshot.hasChild("imageResource")) {
-                        profilePictureResource = snapshot.child("imageResource").getValue(Integer.class);
-                    }
-                    if(snapshot.hasChild("description")) {
-                        description = snapshot.child("description").getValue(String.class);
-                    }
-                    if(snapshot.hasChild("email")) {
-                        email = snapshot.child("email").getValue(String.class);
-                    }
-                    if(snapshot.hasChild("tags")) {
-                        for (DataSnapshot tagsSnapshot : snapshot.child("tags").getChildren()) {
-                            String tag = tagsSnapshot.getValue(String.class);
-                            tags.add(tag);
-                        }
-                    }
-                    if(snapshot.hasChild("posts")) {
-                        for (DataSnapshot postsSnapshot : snapshot.child("posts").getChildren()) {
-                            Post post = new Post(postsSnapshot.child("postID").toString(),
-                                    postsSnapshot.child("ownerID").toString(),
-                                    postsSnapshot.child("trackName").toString(),
-                                    postsSnapshot.child("trackID").toString(),
-                                    postsSnapshot.child("artistName").toString(),
-                                    postsSnapshot.child("content").toString(),
-                                    Long.parseLong(postsSnapshot.child("timestamp").toString()),
-                                    postsSnapshot.child("imageURL").toString(),
-                                    postsSnapshot.child("visibilityState").toString(),
-                                    postsSnapshot.child("spotifyURL").toString());
-                            posts.add(post);
-                        }
-                        Collections.sort(posts,new Comparator<Post>() {
-                            @Override
-                            public int compare(Post o1, Post o2) {
-                                return Long.compare(o2.getTimestamp(), o1.getTimestamp());
-                            }
-                        });
-                    }
-                }
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
+    @Override
+    public void onResume() {
+        super.onResume();
+        viewModel.reset();
     }
 
     private void setUIValues() {
-        binding.description.setText(description);
-        binding.profileImage.setImageResource(profilePictureResource);
-        binding.userName.setText(email);
+        binding.description.setText(viewModel.getDescription());
+        binding.profileImage.setImageResource(viewModel.getProfilePicResource());
+        binding.userName.setText(viewModel.getEmail());
         for(Post post : posts) {
             recentlyListenedToImageURLs.add(post.getImageURL());
         }
+        tagsAdapter.setTags(viewModel.getTags());
+        postsAdapter.setPosts(posts);
+        recentListenedAdapter.setImageUrls(recentlyListenedToImageURLs);
     }
 
     private void setUpAdapters() {
@@ -174,7 +136,7 @@ public class ProfileFragment extends Fragment {
         binding.tags.setAdapter(tagsAdapter);
 
         // Set up PostAdapter and connect to view
-        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), currentUserId);
+        postsAdapter = new PostAdapter(getActivity(), new ArrayList<>(), viewModel.getCurrentID());
         binding.activities.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.activities.setAdapter(postsAdapter);
 
@@ -184,50 +146,39 @@ public class ProfileFragment extends Fragment {
         binding.recentListened.setAdapter(recentListenedAdapter);
     }
 
-    private void showEditProfileButtonOrFollowButton() {
-        // Set up LogOut Button & Edit Profile Button, or Follow Button
-        if (currentUserId.equals(profileOwnerId)) {
-            binding.followButton.setVisibility(View.GONE);
-
+    private void showEditProfileButtonOrFollowButton(boolean followedStatus) {
+        // Set up Edit Profile Button or Follow Button
+        if (viewModel.getCurrentID().equals(profileOwnerId)) {
             // User is viewing their own profile, show Edit Profile Button
             binding.editProfileButton.setVisibility(View.VISIBLE);
+            binding.followButton.setVisibility(View.GONE);
+            binding.unfollowButton.setVisibility(View.GONE);
+
             binding.editProfileButton.setOnClickListener(v -> launchEditProfile());
             Drawable drawable = ContextCompat.getDrawable(requireContext(), R.drawable.profile_edit).mutate();
             drawable.setColorFilter(ContextCompat.getColor(requireContext(), R.color.profile_edit_button_tint), PorterDuff.Mode.SRC_IN);
             binding.editProfileButton.setBackground(drawable);
-            // User is viewing their own profile, show Edit Profile Button
-            binding.LogOutButton.setVisibility(View.VISIBLE);
-            binding.editProfileButton.setOnClickListener(v -> {
-                // Navigate to Login screen after logout
-                Intent intent = new Intent(getActivity(), Login.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                startActivity(intent);
-                getActivity().finish();
-            });
         } else {
             // User is viewing someone else's profile, show Follow Button
-            binding.editProfileButton.setVisibility(View.GONE);
-            // TODO: database update
-            isFollowing = true;
-            if (!isFollowing) {
-                binding.followButton.setVisibility(View.VISIBLE);
-                binding.followButton.setOnClickListener(new View.OnClickListener() {
+            if(followedStatus) {
+                binding.followButton.setVisibility(View.GONE);
+                binding.unfollowButton.setVisibility(View.VISIBLE);
+                binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        follow();
+                        viewModel.unfollow();
                     }
                 });
             } else {
                 binding.followButton.setVisibility(View.VISIBLE);
-                // Change the text of the button and the background color of the button
-                binding.followButton.setText("Unfollow");
-                binding.followButton.setBackgroundColor(Color.RED);
+                binding.unfollowButton.setVisibility(View.GONE);
                 binding.followButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        unfollow();
+                        viewModel.follow();
                     }
                 });
+                binding.editProfileButton.setVisibility(View.GONE);
             }
         }
     }
@@ -235,45 +186,5 @@ public class ProfileFragment extends Fragment {
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);
-    }
-
-    private void follow() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference currentUserRef = rootRef.child("users").child(currentUserId).child("following").child(profileOwnerId);
-        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(currentUserId);
-
-        currentUserRef.setValue(true).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d("ProfileFragment","Follow success!");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("ProfileFragment","Follow unsuccessful!");
-            }
-        });
-        profileOwnerRef.setValue(true);
-    }
-
-    private void unfollow() {
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference currentUserRef = rootRef.child("users").child(currentUserId).child("following").child(profileOwnerId);
-        DatabaseReference profileOwnerRef = rootRef.child("users").child(profileOwnerId).child("followers").child(currentUserId);
-
-        currentUserRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void unused) {
-                Log.d("ProfileFragment","Unfollow success!");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.d("ProfileFragment","Unfollow unsuccessful!");
-            }
-        });
-        profileOwnerRef.setValue(true);
     }
 }
