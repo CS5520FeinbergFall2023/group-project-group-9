@@ -70,17 +70,34 @@ public class EditProfileViewModel extends ViewModel {
                 tagsToUpdate.put(tag,true);
             }
 
-            reference.child("tags").updateChildren(tagsToUpdate);
+            reference.child("tags").updateChildren(tagsToUpdate, new DatabaseReference.CompletionListener() {
+                @Override
+                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                    if (error == null) {
+                        Log.d("UpdateTags", "Tags update successful");
+                    } else {
+                        Log.e("UpdateTags", "Update tags failed: " + error.getMessage());
+                    }
+                }
+            });
 
             DatabaseReference existingTagsReference = reference.child("tags");
-
             existingTagsReference.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     for(DataSnapshot tagSnapshot : snapshot.getChildren()) {
                         String tag = tagSnapshot.getKey();
-                        if(!selectedTags.contains(tag)) {
-                            tagSnapshot.getRef().removeValue();
+                        if (!selectedTags.contains(tag)) {
+                            tagSnapshot.getRef().removeValue(new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(@Nullable DatabaseError error, @NonNull DatabaseReference ref) {
+                                    if (error == null) {
+                                        Log.d("RemoveTag", "Tag removal successful");
+                                    } else {
+                                        Log.e("RemoveTag", "Remove tag failed: " + error.getMessage());
+                                    }
+                                }
+                            });
                         }
                     }
                 }

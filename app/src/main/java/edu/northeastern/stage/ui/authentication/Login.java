@@ -45,15 +45,19 @@ public class Login extends AppCompatActivity {
             loginSuccessIntent();
         }
 
-        if(savedInstanceState != null) {
-            emailET.setText(savedInstanceState.getString("email"));
-            passwordET.setText(savedInstanceState.getString("password"));
-        }
-
         registerBT = findViewById(R.id.registerBT);
         loginBT = findViewById(R.id.loginBT);
         emailET = findViewById(R.id.emailAddressET);
         passwordET = findViewById(R.id.passwordET);
+
+        if(savedInstanceState != null) {
+            if(!savedInstanceState.getString("email").equals("")) {
+                emailET.setText(savedInstanceState.getString("email"));
+            }
+            if(!savedInstanceState.getString("password").equals("")) {
+                passwordET.setText(savedInstanceState.getString("password"));
+            }
+        }
 
         registerBT.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,8 +78,16 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString("email",emailET.getText().toString());
-        outState.putString("password",passwordET.getText().toString());
+        if(emailET.getText().toString().equals("")) {
+            outState.putString("email","");
+        } else {
+            outState.putString("email",emailET.getText().toString());
+        }
+        if(passwordET.getText().toString().equals("")) {
+            outState.putString("password","");
+        } else {
+            outState.putString("password",passwordET.getText().toString());
+        }
     }
 
     private void signIn(String email, String password) {

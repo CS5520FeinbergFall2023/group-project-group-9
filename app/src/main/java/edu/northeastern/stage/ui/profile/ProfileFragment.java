@@ -101,6 +101,7 @@ public class ProfileFragment extends Fragment implements NavigationCallback {
                         postsAdapter.notifyDataSetChanged();
                         recentListenedAdapter.setImageUrls(viewModel.getRecentlyListenedToImageURLs());
                         recentListenedAdapter.notifyDataSetChanged();
+                        viewModel.reset();
                     }
                 });
                 // get followed status

@@ -4,7 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -13,7 +12,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 
-
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -63,7 +62,7 @@ public class EditProfile extends AppCompatActivity {
         tagsRecyclerView.setAdapter(tagsAdapter);
 
         // set up observers
-        setupObservers();
+        setupObservers(savedInstanceState);
 
         // set spinner to images
         String angerResourceString = "anger";
@@ -144,12 +143,18 @@ public class EditProfile extends AppCompatActivity {
     }
 
     @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("description", editDescription.getText().toString());
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         viewModel.reset();
     }
 
-    private void setupObservers() {
+    private void setupObservers(Bundle savedInstanceState) {
         // get current user ID
         viewModel.getUserID().observe(this, userID -> {
             if (userID != null) {
@@ -167,6 +172,11 @@ public class EditProfile extends AppCompatActivity {
                         profilePic.setImageResource(getResources().getIdentifier(viewModel.getProfilePictureResource(), "drawable", getPackageName()));
                     }
                     tagsAdapter.setTags(viewModel.getSelectedTags());
+
+                    // config change keep state
+                    if (savedInstanceState != null) {
+                        editDescription.setText(savedInstanceState.getString("description"));
+                    }
 
                     // Set up button click listener after data retrieval
                     buttonSave.setOnClickListener(new View.OnClickListener() {
@@ -205,6 +215,7 @@ public class EditProfile extends AppCompatActivity {
             List<String> tags = viewModel.getSelectedTags();
             tags.remove(position);
             viewModel.setSelectedTags(tags);
+            tagsAdapter.setTags(tags);
             tagsAdapter.notifyDataSetChanged();
         }
     }
