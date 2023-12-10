@@ -3,13 +3,13 @@
 
     <!-- NavBar -->
     <style name="BottomNavigationStyle" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
-        <item name="itemIconTint">@color/medium_green</item>
-        <item name="itemTextColor">@color/medium_green</item>
+        <item name="itemIconTint">@color/beige</item>
+        <item name="itemTextColor">@color/sage_green</item>
         <item name="backgroundTint">@color/olive_green</item>
     </style>
 
     <!-- Button Style1: Dark -->
-    <style name="DarkButton" parent="Widget.AppCompat.Button">s
+    <style name="DarkButton" parent="Widget.AppCompat.Button">
         <item name="android:background">@drawable/btn_dark_background</item>
         <item name="android:textColor">@color/beige</item>
         <item name="android:textSize">17sp</item>
@@ -24,6 +24,15 @@
         <item name="android:padding">3dp</item>
     </style>
 
+    <!-- Button Style3: Logout -->
+    <style name="LogoutButton" parent="Widget.AppCompat.Button">
+        <item name="android:background">@color/light_cool_grey</item>
+        <item name="android:textColor">#FF0000</item>
+        <item name="android:textSize">17sp</item>
+        <item name="android:padding">3dp</item>
+        <item name="cornerRadius">15dp</item>
+    </style>
+
     <!-- Like Button -->
     <style name="HeartButton">
         <item name="android:src">@drawable/selector_heart</item>
@@ -32,26 +41,33 @@
     <style name="HeadingStyle">
         <item name="android:fontFamily">@font/nunito_bold</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:color">@color/olive_green</item>
+        <item name="android:color">@color/beige</item>
     </style>
 
     <style name="TextStyle">
+        <item name="android:fontFamily">@font/nunito_bold</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:lineSpacingExtra">-1dp</item>
+        <item name="android:textColor">@color/beige</item>
+    </style>
+
+    <style name="contentStyle">
         <item name="android:fontFamily">@font/nunito_regular</item>
         <item name="android:textSize">12sp</item>
         <item name="android:lineSpacingExtra">-1dp</item>
-        <item name="android:color">@color/olive_green</item>
+        <item name="android:textColor">@color/beige</item>
     </style>
 
     <style name="SmallerTextStyle">
         <item name="android:fontFamily">@font/nunito_regular</item>
         <item name="android:textSize">10sp</item>
         <item name="android:lineSpacingExtra">-1dp</item>
-        <item name="android:color">@color/olive_green</item>
+        <item name="android:textColor">@color/beige</item>
     </style>
 
     <style name="CustomEditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="android:textColorHint">@color/olive_green_50</item>
-        <item name="android:color">@color/olive_green</item>
+        <item name="android:color">@color/beige</item>
     </style>
 
 </resources>

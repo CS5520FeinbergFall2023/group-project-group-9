@@ -7,7 +7,7 @@
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     app:cardCornerRadius="16dp"
-    android:background="#80AAAAAA" >
+    android:backgroundTint="@color/light_black" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,20 +16,22 @@
         android:padding="16dp">
 
         <!-- New vertical container for username and user avatar -->
+
+        <!-- Vertical container for texts and like image -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:layout_marginRight="16dp"
-            android:gravity="start">
+            android:gravity="start"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/tvUserName"
+                style="@style/SmallerTextStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Username"
                 android:gravity="start"
-                style="@style/SmallerTextStyle"/>
+                android:text="Username" />
 
             <ImageView
                 android:id="@+id/ivUserAvatar"
@@ -39,11 +41,11 @@
 
         </LinearLayout>
 
-        <!-- Vertical container for texts and like image -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginTop="7dp"
             android:orientation="vertical">
 
             <LinearLayout
@@ -52,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:orientation="horizontal"
-                android:background="@color/medium_green_50"
+                android:background="@color/nested_card"
                 android:padding="6dp">
 
                 <ImageView
@@ -66,8 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:color="@color/medium_green_50">
+                    android:orientation="vertical">
 
                     <TextView
                         android:id="@+id/tvTrackName"
@@ -75,8 +76,8 @@
                         android:layout_height="wrap_content"
                         android:text="TrackName"
                         style="@style/TextStyle"
-                        android:textSize="13dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                        android:textSize="15dp"
+                        android:textColor="@color/olive_green" />
 
                     <TextView
                         android:id="@+id/tvArtistName"
@@ -84,8 +85,7 @@
                         android:layout_height="wrap_content"
                         android:text="ArtistName"
                         style="@style/TextStyle"
-                        android:textSize="10dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                        android:textColor="@color/olive_green" />
                 </LinearLayout>
             </LinearLayout>
 
@@ -95,7 +95,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Post content placeholder"
-                style="@style/TextStyle"
+                style="@style/contentStyle"
                 android:layout_marginTop="8dp" />
 
             <TextView
@@ -112,7 +112,6 @@
             android:id="@+id/visibleState"
             android:layout_width="15dp"
             android:layout_height="15dp"
-            android:color="@color/olive_green"
             android:layout_marginStart="8dp" />
 
         <ImageView

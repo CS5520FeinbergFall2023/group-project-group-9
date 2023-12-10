@@ -16,6 +16,8 @@
         android:hint="@string/explore_search"
         android:popupBackground="@color/beige"
         android:shadowColor="@color/black"
+        android:dropDownHeight="wrap_content"
+        android:dropDownWidth="match_parent"
         app:layout_constraintBottom_toTopOf="@+id/reviewButton"
         app:layout_constraintEnd_toEndOf="@id/reviewButton"
         app:layout_constraintStart_toStartOf="@id/reviewButton"
@@ -69,27 +71,11 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text="0 miles"
         app:layout_constraintBottom_toBottomOf="@+id/circleView"
         app:layout_constraintEnd_toEndOf="@+id/locationSeekBar"
         app:layout_constraintHorizontal_bias="0.028"
         app:layout_constraintStart_toStartOf="@+id/locationSeekBar"
         app:layout_constraintTop_toBottomOf="@+id/locationSeekBar"
         app:layout_constraintVertical_bias="0.0" />
-
-    <!--    <Switch-->
-    <!--        android:id="@+id/CircleOrList"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:checked="false"-->
-    <!--        android:text="List"-->
-    <!--        app:layout_constraintBottom_toTopOf="@id/circleView"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintHorizontal_bias="0.1"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toBottomOf="@id/reviewButton"-->
-    <!--        app:layout_constraintVertical_bias="0.0"-->
-    <!--        tools:textColor="@color/olive_green" />-->
-
-
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -33,22 +33,28 @@ public class MusicReviewViewModel extends ViewModel {
     public void fetchReviews() {
         FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
         DatabaseReference rootRef = mDatabase.getReference();
-        DatabaseReference userRef = rootRef.child("users");
+        DatabaseReference usersRef = rootRef.child("users");
 
         List<Review> currentReviews = new ArrayList<>();
 
-        Query reviewQuery = userRef.orderByChild("reviews/trackID").equalTo(track.getId());
-        reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+        // Iterate over each user
+        usersRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
-                    String reviewUserID = reviewSnapshot.child("userID").getValue(String.class); // Get the userID for each review
-                    Review review = new Review(reviewUserID,
-                            reviewSnapshot.child("content").getValue().toString(),
-                            Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
-                            Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
-                            reviewSnapshot.child("trackID").getValue().toString());
-                    currentReviews.add(review);
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                    DataSnapshot reviewsSnapshot = userSnapshot.child("reviews");
+                    for (DataSnapshot reviewSnapshot : reviewsSnapshot.getChildren()) {
+                        String reviewTrackID = reviewSnapshot.child("trackID").getValue(String.class);
+                        if (track.getId().equals(reviewTrackID)) {
+                            String reviewUserID = reviewSnapshot.child("userID").getValue(String.class); // Get the userID for each review
+                            Review review = new Review(reviewUserID,
+                                    reviewSnapshot.child("content").getValue(String.class),
+                                    Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
+                                    Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
+                                    reviewSnapshot.child("trackID").getValue(String.class));
+                            currentReviews.add(review);
+                        }
+                    }
                 }
                 Collections.sort(currentReviews, new Comparator<Review>() {
                     @Override
@@ -58,6 +64,7 @@ public class MusicReviewViewModel extends ViewModel {
                 });
                 setReviews(currentReviews);
             }
+
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {

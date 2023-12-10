@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,128 +19,74 @@ import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import edu.northeastern.stage.R;
 
 public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
 
-    private LayoutInflater inflater;
-    private AutoCompleteTextView songSearchACTV;
-    private JsonObject selectedResult;
-    Context context;
+    final private LayoutInflater inflater;
+    final private ArrayList<JsonObject> results;
+    final private Context context;
 
-    public TrackSearchAdapter(Context context, AutoCompleteTextView songSearchACTV) {
-        super(context, 0, new ArrayList<>());
-        Log.d("TrackSearchAdapter", "Constructor called");
-        this.context = context;
+    public TrackSearchAdapter(Context context, ArrayList<JsonObject> results) {
+        super(context, R.layout.item_search, results);
         inflater = LayoutInflater.from(context);
-        this.songSearchACTV = songSearchACTV;
+        this.context = context;
+        this.results = results;
     }
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        ViewHolder viewHolder;
-        if (convertView == null) {
-            convertView = inflater.inflate(R.layout.item_search, parent, false);
-            viewHolder = new ViewHolder(convertView);
-            convertView.setTag(viewHolder);
-        } else {
-            viewHolder = (ViewHolder) convertView.getTag();
-        }
-
-        JsonObject result = getItem(position);
-        Log.d("TrackSearchAdapter", "Position: " + position);
-
-        if(result != null) {
-            Log.d("TrackSearchAdapter", "getView - RESULT NOT NULL");
-            viewHolder.bind(convertView.getContext(),result);
-        } else {
-            Log.d("TrackSearchAdapter", "getView - RESULT NULL");
-        }
-
-        return convertView;
-    }
-
-    public void setSelectedResult(List<JsonObject> selectedResults) {
-        clear();
-        if(selectedResults != null) {
-            addAll(selectedResults);
-            notifyDataSetChanged();
-            Log.d("TrackSearchAdapter", "Adapter size after addAll: " + getCount());
-        }
+        return createItemView(position,  parent);
     }
 
     @Override
-    public int getCount() {
-        return super.getCount();
+    public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+        return createItemView(position,  parent);
     }
 
-    @Nullable
-    @Override
-    public JsonObject getItem(int position) {
-        return super.getItem(position);
-    }
+    private View createItemView(int position, ViewGroup parent) {
+        View view = inflater.inflate(R.layout.item_search, parent, false);
 
-    private static class ViewHolder {
-        TextView trackTitleTV;
-        TextView artistNameTV;
-        ImageView albumIV;
+        Log.d("TrackSearchAdapter","getView called for position: " + position);
 
-        ViewHolder(View view) {
-            trackTitleTV = view.findViewById(R.id.trackTitleTV);
-            artistNameTV = view.findViewById(R.id.artistNameTV);
-            albumIV = view.findViewById(R.id.songAlbumIV);
+        TextView trackTitleTV = view.findViewById(R.id.trackTitleTV);
+        TextView artistNameTV = view.findViewById(R.id.artistNameTV);
+        ImageView albumIV = view.findViewById(R.id.songAlbumIV);
+
+        trackTitleTV.setText(results.get(position).get("name").getAsString());
+        JsonArray artistsArray = results.get(position).getAsJsonArray("artists");
+
+        if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
+            StringBuilder artistsSB = new StringBuilder();
+            Iterator<JsonElement> iterator = artistsArray.iterator();
+
+            while (iterator.hasNext()) {
+                artistsSB.append(iterator.next().getAsJsonObject().get("name").getAsString());
+
+                if (iterator.hasNext()) {
+                    artistsSB.append(", ");
+                }
+            }
+            artistNameTV.setText(artistsSB.toString());
         }
 
-        void bind(Context context, JsonObject result) {
+        String imageURL = "";
+        JsonObject albumObject = results.get(position).getAsJsonObject("album");
+        if (albumObject != null) {
+            JsonArray imagesArray = albumObject.getAsJsonArray("images");
+            if (imagesArray != null && imagesArray.size() > 0) {
+                imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
+            }
+        }
 
-            try {
-                Log.d("TrackSearchAdapter", "bind - Binding result: " + result.get("name").getAsString());
-                String artists = "";
-                String imageURL = "";
-                trackTitleTV.setText("");
-                artistNameTV.setText("");
-                albumIV.setImageDrawable(null);
-
-                trackTitleTV.setText(result.get("name").getAsString());
-
-                JsonArray artistsArray = result.getAsJsonArray("artists");
-
-                if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
-                    StringBuilder artistsSB = new StringBuilder();
-                    Iterator<JsonElement> iterator = artistsArray.iterator();
-
-                    while (iterator.hasNext()) {
-                        artistsSB.append(iterator.next().getAsJsonObject().get("name").getAsString());
-
-                        if (iterator.hasNext()) {
-                            artistsSB.append(", ");
-                        }
-                    }
-
-                    artistNameTV.setText(artistsSB.toString());
-                }
-
-
-                JsonObject albumObject = result.getAsJsonObject("album");
-                if (albumObject != null) {
-                    JsonArray imagesArray = albumObject.getAsJsonArray("images");
-                    if (imagesArray != null && imagesArray.size() > 0) {
-                        imageURL = imagesArray.get(0).getAsJsonObject().get("url").getAsString();
-                    }
-                }
-
-                Glide.with(context)
-                        .load(imageURL)
+        Glide.with(context)
+                .load(imageURL)
 //                  .placeholder(R.drawable.placeholder_image) // Set a placeholder image
 //                  .error(R.drawable.error_image) // Set an error image
-                        .into(albumIV);
-            } catch (Exception e) {
-                Log.e("TrackSearchAdapter", "bind - Error binding result", e);
-            }
+                .into(albumIV);
 
-        }
+        return view;
     }
 }

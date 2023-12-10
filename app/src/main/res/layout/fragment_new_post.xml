@@ -14,7 +14,7 @@
         android:layout_marginEnd="16dp"
         android:contentDescription="album_cover"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_album_placeholder"
+        android:src="@drawable/album_placeholder"
         app:layout_constraintBottom_toTopOf="@+id/actvSongSearch"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"

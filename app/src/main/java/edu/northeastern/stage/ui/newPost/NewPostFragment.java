@@ -43,10 +43,7 @@ public class NewPostFragment extends Fragment {
     private SharedDataViewModel sharedDataViewModel;
     private JsonObject selectedTrack;
     private String visibilityState;
-
     private TrackSearchAdapter searchAdapter;
-    private static final int SEARCH_DELAY = 500;
-    private long lastSearchTime = 0;
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentNewPostBinding.inflate(inflater, container, false);
@@ -55,8 +52,6 @@ public class NewPostFragment extends Fragment {
         // share data between models
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
         viewModel = new ViewModelProvider(this).get(NewPostViewModel.class);
-
-        searchAdapter = new TrackSearchAdapter(getContext(), binding.actvSongSearch);
 
         // get user ID
         sharedDataViewModel.getUserID().observe(getViewLifecycleOwner(), userID -> {
@@ -99,15 +94,8 @@ public class NewPostFragment extends Fragment {
                 viewModel.createPost(postContent, visibilityState);
                 Toast.makeText(getActivity(), "Submit successful!", Toast.LENGTH_SHORT).show();
 
-//                NavOptions navOptions = new NavOptions.Builder()
-//                        .setPopUpTo(R.id.navigation_new_post, true)
-//                        .build();
-
-                // Navigate to home after submission
-//                NavController navController = NavHostFragment.findNavController(NewPostFragment.this);
-//                navController.navigate(R.id.action_navigation_new_post_to_navigation_home, null, navOptions);
                 ((MainActivity)requireActivity()).removeFragmentFromBackStack("NEW_POST_FRAGMENT");
-                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true);
+                ((MainActivity)requireActivity()).navigateToFragment("HOME_FRAGMENT", true, null);
             }
         });
 
@@ -122,10 +110,7 @@ public class NewPostFragment extends Fragment {
         return root;
     }
 
-    // TODO: it seems like the autocomplete/search doesn't work until you delete something from the search string
-    // TODO: API is getting 10 songs but the view is not being updated
     private void setupSearch() {
-            binding.actvSongSearch.setAdapter(searchAdapter);
             binding.actvSongSearch.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -138,34 +123,20 @@ public class NewPostFragment extends Fragment {
 
                 @Override
                 public void afterTextChanged(Editable s) {
-//                    viewModel.performSearch(s.toString())
-//                            .observe(getViewLifecycleOwner(), searchResults -> {
-//                                searchAdapter.clear();
-//                                ArrayList<JsonObject> newResults = new ArrayList<>(searchResults);
-//                                searchAdapter.addAll(newResults);
-//                                searchAdapter.notifyDataSetChanged();
-//                            });
-
                     try {
-                        long currentTime = System.currentTimeMillis();
-                        // add delay of 500 ms between current time and last search time for efficiency
-                        // search length should be more than 0
-                        if(currentTime - lastSearchTime > SEARCH_DELAY && s.length() != 0) {
-                            lastSearchTime = currentTime;
-                            binding.actvSongSearch.showDropDown();
-
-                            Log.d("NewPostFragment", "afterTextChanged - Performing search for: " + s.toString());
+                        if(s.length() != 0) {
                             viewModel.performSearch(s.toString())
                                     .observe(getViewLifecycleOwner(), searchResults -> {
-                                        searchAdapter.clear();
-                                        Log.d("NewPostFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+                                        ArrayList<JsonObject> results = new ArrayList<>();
 
                                         for (int i = 0; i < searchResults.size(); i++) {
-                                            Log.d("NewPostFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
-                                            searchAdapter.add(searchResults.get(i).getAsJsonObject());
+                                            results.add(searchResults.get(i).getAsJsonObject());
                                         }
+                                        searchAdapter = new TrackSearchAdapter(getContext(),results);
+                                        binding.actvSongSearch.setAdapter(searchAdapter);
                                         searchAdapter.notifyDataSetChanged();
                                     });
+                            binding.actvSongSearch.showDropDown();
                         }
                     } catch (Exception e) {
                         Log.e("NewPostFragment", "afterTextChanged - Error performing search", e);

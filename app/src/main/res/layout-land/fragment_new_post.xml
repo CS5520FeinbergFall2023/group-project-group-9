@@ -14,7 +14,7 @@
         android:layout_marginRight="16dp"
         android:contentDescription="album_cover"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_album_placeholder"
+        android:src="@drawable/album_placeholder"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/etPostContent"
         app:layout_constraintHorizontal_chainStyle="packed"

@@ -17,13 +17,11 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -31,16 +29,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
-import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.northeastern.stage.databinding.ActivityMainBinding;
-//import edu.northeastern.stage.model.Location;
+import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.explore.ExploreFragment;
 import edu.northeastern.stage.ui.home.HomeFragment;
@@ -51,7 +46,7 @@ import edu.northeastern.stage.ui.profile.ProfileFragment;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
 // TODO: Add comments for newly added navigation methods.
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PostAdapter.NavigationCallback {
     private ActivityMainBinding binding;
     private boolean isUserInteraction = false;
     private boolean isProgrammaticSelection = false;
@@ -132,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 isUserInteraction = true;
                 int itemId = item.getItemId();
                 Log.d("NavigationAttempt", "Attempting to navigate to item ID: " + itemId);
-                navigateToFragment(getFragmentTag(itemId), true); // Ensure this is calling navigateToFragment
+                navigateToFragment(getFragmentTag(itemId), true, null); // Ensure this is calling navigateToFragment
                 isUserInteraction = false;
             }
             return true;
@@ -217,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    public void navigateToFragment(String tag, boolean addToStack) {
+    public void navigateToFragment(String tag, boolean addToStack, Bundle data) {
         if (addToStack) {
             customBackStack.pushOrBringToFront(tag);
         }
@@ -232,7 +227,7 @@ public class MainActivity extends AppCompatActivity {
         }
         isProgrammaticSelection = false;
 
-        switchFragment(itemId);
+        switchFragment(itemId, data);
         Log.d("NavigateToFragment", "Navigating to: " + tag + ", addToStack: " + addToStack);
 
     }
@@ -245,25 +240,28 @@ public class MainActivity extends AppCompatActivity {
         if (itemId == R.id.navigation_explore) {
             if (customBackStack.peekFirst().equalsIgnoreCase("MUSIC_REVIEW_FRAGMENT")) {
                 customBackStack.pop();
-                navigateToFragment("EXPLORE_FRAGMENT", true);
+                navigateToFragment("EXPLORE_FRAGMENT", true, null);
             } else if (customBackStack.peekFirst().equalsIgnoreCase("SUBMIT_REVIEW_FRAGMENT")) {
                 customBackStack.pop();
-                navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
+                navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
+            }
+        } else if (itemId == R.id.navigation_profile) {
+            if (customBackStack.peekFirst().equalsIgnoreCase("OTHER_PROFILE_FRAGMENT")) {
+                customBackStack.pop();
+                navigateToFragment("PROFILE_FRAGMENT", true, null);
             }
         }
     }
 
-    private void switchFragment(int itemId) {
+    private void switchFragment(int itemId, Bundle data) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         String tag = getFragmentTag(itemId);
 
-//        Fragment currentFragment = fragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main);
-//        if (currentFragment != null && tag.equals(customBackStack.peekFirst())) {
-//            return;
-//        }
-
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
         Fragment newFragment = createFragmentForItem(itemId);
+        if (data != null) {
+            newFragment.setArguments(data); // Pass the bundle to the fragment
+        }
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.nav_host_fragment_activity_main, newFragment, tag);
         transaction.commit();
 
@@ -283,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 customBackStack.pop(); // Remove current fragment from custom stack
                 String newTopFragmentTag = customBackStack.peekFirst();
-                navigateToFragment(newTopFragmentTag, false);
+                navigateToFragment(newTopFragmentTag, false, null);
             }
         }
     };
@@ -301,6 +299,8 @@ public class MainActivity extends AppCompatActivity {
             return R.id.navigation_music_review;
         } else if ("SUBMIT_REVIEW_FRAGMENT".equalsIgnoreCase(tag)) {
             return R.id.navigation_submit_review;
+        } else if ("OTHER_PROFILE_FRAGMENT".equalsIgnoreCase(tag)) {
+            return R.id.navigation_profile;
         }
         return -1; // Indicates error
     }
@@ -339,4 +339,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onNavigateToProfile(String profileOwnerId) {
+        Bundle bundle = new Bundle();
+        bundle.putString("PROFILE_OWNER_ID", profileOwnerId);
+        navigateToFragment("OTHER_PROFILE_FRAGMENT", true, bundle);
+    }
 }

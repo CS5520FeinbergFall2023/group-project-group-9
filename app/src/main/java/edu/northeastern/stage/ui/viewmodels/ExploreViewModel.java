@@ -114,7 +114,7 @@ public class ExploreViewModel extends ViewModel {
         MutableLiveData<List<JsonObject>> searchResults = new MutableLiveData<>();
 
         // change numResults
-        CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 10);
+        CompletableFuture<ArrayList<JsonObject>> trackSearchFuture = spotify.trackSearch(query, 4);
         trackSearchFuture.thenAccept(searchResult -> {
             searchResults.postValue(searchResult);
             Log.d("ExploreViewModel", "performSearch - searchResult in trackSearchFuture: " + searchResult.get(0));

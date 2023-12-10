@@ -50,6 +50,7 @@ public class ProfileViewModel extends ViewModel {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()) {
                         setIsFollowing(true);
+                        followedStatus.setValue(isFollowing && isFollowed);
                     }
                 }
                 @Override
@@ -62,13 +63,13 @@ public class ProfileViewModel extends ViewModel {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()) {
                         setIsFollowed(true);
+                        followedStatus.setValue(isFollowing && isFollowed);
                     }
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                 }
             });
-            followedStatus.setValue(isFollowing && isFollowed);
         }
 
     }

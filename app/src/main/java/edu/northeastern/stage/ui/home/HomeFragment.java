@@ -13,13 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 
+import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.ui.adapters.PostAdapter;
 import edu.northeastern.stage.R;
 import edu.northeastern.stage.ui.viewmodels.HomeViewModel;
-import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements PostAdapter.NavigationCallback {
 
     private RecyclerView recyclerView;
     private PostAdapter adapter;
@@ -39,7 +39,7 @@ public class HomeFragment extends Fragment {
             if (userID != null) {
                 viewModel.setCurrentUserId(userID);
                 viewModel.loadPosts();
-                adapter = new PostAdapter(getActivity(),new ArrayList<>(),viewModel.getCurrentUserId()); // Initialize with empty list
+                adapter = new PostAdapter(getActivity(),new ArrayList<>(),viewModel.getCurrentUserId(), this); // Initialize with empty list
                 recyclerView.setAdapter(adapter);
             }
         });
@@ -55,5 +55,15 @@ public class HomeFragment extends Fragment {
         });
 
         return view;
+    }
+
+    @Override
+    public void onNavigateToProfile(String profileOwnerId) {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        if (mainActivity != null) {
+            Bundle bundle = new Bundle();
+            bundle.putString("PROFILE_OWNER_ID", profileOwnerId);
+            mainActivity.navigateToFragment("OTHER_PROFILE_FRAGMENT", true, bundle);
+        }
     }
 }

@@ -83,7 +83,7 @@ public class SubmitReviewFragment extends Fragment {
 //            NavController navController = NavHostFragment.findNavController(SubmitReviewFragment.this);
 //            navController.navigate(R.id.action_navigation_submit_review_to_navigation_music_review, null, navOptions);
             ((MainActivity)requireActivity()).removeFragmentFromBackStack("SUBMIT_REVIEW_FRAGMENT");
-            ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true);
+            ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
         }
     }
 }

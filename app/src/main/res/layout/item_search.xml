@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="16dp">
+    android:backgroundTintMode="screen"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,6 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Song Title"
+                android:textColor="@color/olive_green"
                 android:layout_marginBottom="8dp" />
 
             <!-- Post content TextView -->
@@ -48,6 +50,7 @@
                 android:id="@+id/artistNameTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/olive_green"
                 android:text="Artist" />
 
         </LinearLayout>

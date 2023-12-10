@@ -40,37 +40,12 @@
                 app:layout_constraintLeft_toLeftOf="@+id/textView_pfp"
                 app:layout_constraintTop_toBottomOf="@+id/textView_pfp" />
 
-            <!--            <TextView-->
-            <!--                android:id="@+id/textView_userName"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:text="User Name: "-->
-            <!--                style="@style/TextStyle"-->
-            <!--                app:layout_constraintLeft_toLeftOf="parent"-->
-            <!--                app:layout_constraintRight_toRightOf="parent"-->
-            <!--                app:layout_constraintHorizontal_bias="0.65"-->
-            <!--                app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--                app:layout_constraintTop_toTopOf="parent"-->
-            <!--                app:layout_constraintVertical_bias="0.1" />-->
-
-            <!--            <EditText-->
-            <!--                android:id="@+id/editUsername"-->
-            <!--                android:layout_width="wrap_content"-->
-            <!--                android:layout_height="wrap_content"-->
-            <!--                android:text="UserName"-->
-            <!--                style="@style/HeadingStyle"-->
-            <!--                app:layout_constraintLeft_toLeftOf="@+id/textView_userName"-->
-            <!--                app:layout_constraintBottom_toBottomOf="parent"-->
-            <!--                app:layout_constraintTop_toTopOf="parent"-->
-            <!--                app:layout_constraintVertical_bias="0.14" />-->
-
             <Spinner
                 android:id="@+id/editProfilePicSpinner"
                 android:layout_width="96dp"
                 android:layout_height="48dp"
-                android:background="@drawable/btn_dark_background"
-                android:contentDescription="Select your profile picture"
                 android:padding="8dp"
+                android:focusable="true"
                 app:layout_constraintBottom_toBottomOf="@id/profilePicture"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/profilePicture"
@@ -89,6 +64,7 @@
             <EditText
                 android:id="@+id/editDescription"
                 style="@style/TextStyle"
+                android:textColor="@color/olive_green"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:text="A music enthusiastic. Welcome to my home page, explore and enjoy my rhythms!. "
@@ -98,6 +74,7 @@
             <TextView
                 android:id="@+id/textView_tags"
                 style="@style/TextStyle"
+                android:textColor="@color/olive_green"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="25dp"
@@ -119,6 +96,7 @@
             <AutoCompleteTextView
                 android:id="@+id/editTags"
                 style="@style/TextStyle"
+                android:textColor="@color/olive_green"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="Type tags here"
@@ -126,15 +104,17 @@
                 app:layout_constraintTop_toBottomOf="@+id/tagsRecyclerView"
                 app:layout_constraintVertical_bias="0.55"></AutoCompleteTextView>
 
-            <!--            use this to set the background color of the button-->
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/buttonSaveProfile"
-                style="@style/DarkButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:onClick="reviewButtonPressed"
                 android:text="Save"
+                app:layout_constraintHorizontal_bias="0.892"
                 app:layout_constraintRight_toRightOf="@+id/editProfilePicSpinner"
-                app:layout_constraintTop_toBottomOf="@+id/editTags" />
+                app:layout_constraintTop_toBottomOf="@+id/editTags"  />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

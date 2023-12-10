@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="sage_green">#CEDEBD</color>
+    <color name="sage_green">#B7CCA4</color>
     <color name="medium_green">#9EB384</color>
     <color name="olive_green">#435334</color>
     <color name="green">#474833</color>
@@ -11,4 +11,24 @@
     <!--    50% transparency color-->
     <color name="medium_green_50">#809EB384</color>
     <color name="olive_green_50">#80435334</color>
+
+    <!-- Softer Greens -->
+    <color name="soft_green">#C2D585</color>
+
+    <!-- Earthy Browns -->
+    <color name="tan">#D1B386</color>
+    <color name="light_brown">#AD8B73</color>
+    <color name="card_brown">#B08B5B</color>
+    <color name="nested_card">#EBE1D8</color>
+
+    <!-- Cream -->
+    <color name="cream">#E9DCC3</color>
+
+    <color name="light_black">#252525</color>
+
+    <!-- Blue Accent -->
+    <color name="light_blue">#5C7980</color>
+
+    <color name="light_cool_grey">#B7C0C3</color>
+
 </resources>
