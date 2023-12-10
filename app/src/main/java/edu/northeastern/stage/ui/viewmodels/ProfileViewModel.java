@@ -50,8 +50,10 @@ public class ProfileViewModel extends ViewModel {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()) {
                         setIsFollowing(true);
-                        followedStatus.setValue(isFollowing && isFollowed);
+                    } else {
+                        setIsFollowing(false);
                     }
+                    followedStatus.setValue(isFollowing && isFollowed);
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
@@ -63,8 +65,10 @@ public class ProfileViewModel extends ViewModel {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if(snapshot.exists()) {
                         setIsFollowed(true);
-                        followedStatus.setValue(isFollowing && isFollowed);
+                    } else {
+                        setIsFollowed(false);
                     }
+                    followedStatus.setValue(isFollowing && isFollowed);
                 }
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
@@ -129,6 +133,8 @@ public class ProfileViewModel extends ViewModel {
                         for(Post post : posts) {
                             recentlyListenedToImageURLs.add(post.getImageURL());
                         }
+                        followStatus();
+
                     }
                 }
                 dataRetrieved.setValue(true);
@@ -176,10 +182,37 @@ public class ProfileViewModel extends ViewModel {
                 Log.d("ProfileFragment","Unfollow unsuccessful!");
             }
         });
-        profileOwnerRef.setValue(true);
+        profileOwnerRef.removeValue();
     }
 
+    private boolean isFriend(Post post) {
 
+        final boolean[] isFriend = {false};
+
+        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
+
+        DatabaseReference reference = mDatabase
+                .getReference("users")
+                .child(currentID);
+
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.child("following").hasChild(post.getOwnerID()) &&
+                        snapshot.child("followers").hasChild(post.getOwnerID())) {
+                    isFriend[0] = true;
+                } else {
+                    isFriend[0] = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+
+        return isFriend[0];
+    }
     private void setIsFollowing(boolean following) {
         isFollowing = following;
     }

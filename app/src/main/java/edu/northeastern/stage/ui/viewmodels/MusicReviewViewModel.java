@@ -64,8 +64,6 @@ public class MusicReviewViewModel extends ViewModel {
                 });
                 setReviews(currentReviews);
             }
-
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 

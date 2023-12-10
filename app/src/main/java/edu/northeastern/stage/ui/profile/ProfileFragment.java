@@ -77,7 +77,7 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                     profileOwnerId = userID;
                 }
 
-                // set profile owner ID and current ID in the viewmodel
+                // set profile owner ID and current ID in the view model
                 viewModel.setProfileOwnerID(profileOwnerId);
                 viewModel.setCurrentID(userID);
 
@@ -93,9 +93,6 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                         posts = viewModel.getPosts();
                         setUIValues();
 
-                        // initiate follow status
-                        viewModel.followStatus();
-
                         // update adapters
                         tagsAdapter.setTags(viewModel.getTags());
                         tagsAdapter.notifyDataSetChanged();
@@ -105,41 +102,41 @@ public class ProfileFragment extends Fragment implements PostAdapter.NavigationC
                         recentListenedAdapter.notifyDataSetChanged();
                     }
                 });
-
                 // get followed status
                 viewModel.getFollowedStatus().observe(getViewLifecycleOwner(), followedStatus -> {
                     // true = following this profile owner
                     // false = not following this profile owner
-                    binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            viewModel.unfollow();
-                            binding.followButton.setVisibility(View.VISIBLE);
-                            binding.unfollowButton.setVisibility(View.GONE);
-                        }
-                    });
-                    binding.followButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            viewModel.follow();
-                            binding.followButton.setVisibility(View.GONE);
-                            binding.unfollowButton.setVisibility(View.VISIBLE);
-                        }
-                    });
                     showEditProfileButtonOrFollowButton(followedStatus);
                 });
+            }
+        });
 
-                //set up logout button
-                binding.LogOutButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent intent = new Intent(requireContext(), Login.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-                        mAuth.signOut(); // use this to sign out
-                        startActivity(intent);
-                    }
-                });
+        binding.unfollowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.unfollow();
+                binding.followButton.setVisibility(View.VISIBLE);
+                binding.unfollowButton.setVisibility(View.GONE);
+            }
+        });
+        binding.followButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewModel.follow();
+                binding.followButton.setVisibility(View.GONE);
+                binding.unfollowButton.setVisibility(View.VISIBLE);
+            }
+        });
+
+        //set up logout button
+        binding.LogOutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(requireContext(), Login.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                mAuth.signOut(); // use this to sign out
+                startActivity(intent);
             }
         });
 

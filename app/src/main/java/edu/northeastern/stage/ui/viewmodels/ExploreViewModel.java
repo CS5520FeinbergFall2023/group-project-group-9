@@ -33,6 +33,7 @@ import edu.northeastern.stage.ui.explore.CircleView;
 public class ExploreViewModel extends ViewModel {
 
     private MutableLiveData<List<JsonObject>> recommendations = new MutableLiveData<>();
+    private MutableLiveData<Map<String,Integer>> tracksFrequency = new MutableLiveData<>();
     private String track;
     private Spotify spotify = new Spotify();
     private static final Random rand = new Random();
@@ -42,46 +43,47 @@ public class ExploreViewModel extends ViewModel {
     List<Circle> circles;
     final private float METER_TO_MILES_CONVERSION = 0.000621371F;
 
-    public Map<String,Integer> getTracksNearby(Integer radius) {
+    public MutableLiveData<Map<String,Integer>> getTracksNearby(Integer radius) {
 
         Location userLocation = new Location("");
+        Map<String,Integer> frequency = new HashMap<>();
 
-        DatabaseReference currentUserReference = FirebaseDatabase.getInstance().getReference("users").child(userID);
+        DatabaseReference currentUserReference = FirebaseDatabase.getInstance().getReference("users").child(userID).child("lastLocation");
 
+        // get current user location
         currentUserReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                userLocation.setLatitude(Double.parseDouble(snapshot.child("latitude").getKey()));
-                userLocation.setLongitude(Double.parseDouble(snapshot.child("longitude").getKey()));
-            }
+                userLocation.setLatitude(Double.parseDouble(snapshot.child("latitude").getValue().toString()));
+                userLocation.setLongitude(Double.parseDouble(snapshot.child("longitude").getValue().toString()));
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-
-        Map<String,Integer> tracksFrequency = new HashMap<>();
-        FirebaseDatabase mDatabase = FirebaseDatabase.getInstance();
-        DatabaseReference reference = mDatabase.getReference("users");
-
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                    if(isWithinDistance(Double.parseDouble(userSnapshot.child("location").child("latitude").getKey()),
-                            Double.parseDouble(userSnapshot.child("location").child("longitude").getKey()),
-                            userLocation.getLatitude(), userLocation.getLongitude(),radius)) {
-                        for (DataSnapshot trackSnapshot : userSnapshot.child("posts").getChildren()) {
-                            String trackID = trackSnapshot.child("trackID").getValue(String.class);
-                            if(tracksFrequency.containsKey(trackID)) {
-                                tracksFrequency.put(trackID, tracksFrequency.get(trackID) + 1);
-                            } else {
-                                tracksFrequency.put(trackID,1);
+                DatabaseReference reference = FirebaseDatabase.getInstance().getReference("users");
+                reference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            if(isWithinDistance(Double.parseDouble(userSnapshot.child("lastLocation").child("latitude").getValue().toString()),
+                                    Double.parseDouble(userSnapshot.child("lastLocation").child("longitude").getValue().toString()),
+                                    userLocation.getLatitude(), userLocation.getLongitude(),radius)) {
+                                for (DataSnapshot trackSnapshot : userSnapshot.child("posts").getChildren()) {
+                                    String trackID = trackSnapshot.child("trackID").getValue(String.class);
+                                    if(frequency.containsKey(trackID)) {
+                                        frequency.put(trackID, frequency.get(trackID) + 1);
+                                    } else {
+                                        frequency.put(trackID,1);
+                                    }
+                                }
                             }
                         }
+                        tracksFrequency.setValue(frequency);
                     }
-                }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+
+                });
             }
 
             @Override

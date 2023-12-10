@@ -22,7 +22,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
@@ -83,11 +82,9 @@ public class ExploreFragment extends Fragment {
 
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            int progressChangedValue = 0;
-
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                progressChangedValue = progress;
-                String progressText = progressChangedValue + " miles";
+                currentMileRadius = progress;
+                String progressText = currentMileRadius + " miles";
                 progressTextView.setText(progressText);
 
                 int width = geoSlider.getWidth() - geoSlider.getPaddingLeft() - geoSlider.getPaddingRight();
@@ -97,7 +94,12 @@ public class ExploreFragment extends Fragment {
                 int txtW = progressTextView.getMeasuredWidth();
                 int delta = txtW / 2;
                 progressTextView.setX(geoSlider.getX() + thumbPos - delta);
-                currentMileRadius = geoSlider.getProgress();
+
+                viewModel.getTracksNearby(currentMileRadius).observe(getViewLifecycleOwner(),tracksFrequency -> {
+                    Log.d("ABC123","Current mile radius: " + String.valueOf(currentMileRadius));
+                    Log.d("ABC123","Tracks found - " + tracksFrequency.toString());
+                });
+
             }
 
             public void onStartTrackingTouch(SeekBar seekBar) {

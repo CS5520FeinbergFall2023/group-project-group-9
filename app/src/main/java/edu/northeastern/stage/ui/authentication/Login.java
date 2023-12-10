@@ -32,7 +32,6 @@ public class Login extends AppCompatActivity {
     Button loginBT;
     EditText emailET;
     EditText passwordET;
-    TextView resetPWTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +54,6 @@ public class Login extends AppCompatActivity {
         loginBT = findViewById(R.id.loginBT);
         emailET = findViewById(R.id.emailAddressET);
         passwordET = findViewById(R.id.passwordET);
-        resetPWTV = findViewById(R.id.resetPasswordTV);
 
         registerBT.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,16 +67,6 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 signIn(emailET.getText().toString(), passwordET.getText().toString());
-            }
-        });
-
-        resetPWTV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ResetPWDialogFragment resetDialog = new ResetPWDialogFragment();
-
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                resetDialog.show(fragmentManager, ResetPWDialogFragment.TAG);
             }
         });
     }
