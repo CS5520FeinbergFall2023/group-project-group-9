@@ -45,14 +45,15 @@
             android:orientation="vertical">
 
             <!-- User ID TextView above the post content -->
+
+            <!-- Post content TextView -->
             <TextView
                 android:id="@+id/tvUserId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="User ID placeholder"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:text="User ID placeholder" />
 
-            <!-- Post content TextView -->
             <TextView
                 android:id="@+id/tvPostContent"
                 android:layout_width="match_parent"

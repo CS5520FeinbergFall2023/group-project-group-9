@@ -6,6 +6,32 @@
     android:layout_height="match_parent"
     tools:context=".ui.authentication.Register">
 
+
+    <ImageView
+        android:id="@+id/userNameIV"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        app:srcCompat="@drawable/user"
+        app:layout_constraintEnd_toStartOf="@id/userNameET"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/userNameET"
+        app:layout_constraintBottom_toBottomOf="@id/userNameET"
+        app:layout_constraintHorizontal_chainStyle="packed" />
+
+    <EditText
+        android:id="@+id/userNameET"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="johndoe"
+        android:inputType="text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/userNameIV"
+        app:layout_constraintBottom_toTopOf="@id/emailAddressET"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
     <EditText
         android:id="@+id/emailAddressET"
         android:layout_width="wrap_content"
@@ -15,8 +41,8 @@
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/emailAddressIV"
+        app:layout_constraintTop_toBottomOf="@id/userNameET"
         app:layout_constraintBottom_toTopOf="@id/passwordET"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintVertical_chainStyle="packed"/>
 
@@ -62,6 +88,7 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:hint="confirm password"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/pwConfirmIV"
         app:layout_constraintTop_toBottomOf="@id/passwordET"
@@ -84,7 +111,7 @@
         android:id="@+id/spinnerIV"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:padding="8dp"
+        android:padding="2dp"
         android:background="@drawable/btn_dark_background"
         android:contentDescription="Select your profile picture"
         app:layout_constraintTop_toBottomOf="@id/pwConfirmIV"

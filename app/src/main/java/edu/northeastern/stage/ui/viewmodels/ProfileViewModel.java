@@ -30,7 +30,7 @@ public class ProfileViewModel extends ViewModel {
     private boolean isFollowed;
     private Integer profilePicResource;
     private String description;
-    private String email;
+    private String userName;
     private List<Post> posts = new ArrayList<>();
     private List<String> recentlyListenedToImageURLs = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
@@ -95,8 +95,8 @@ public class ProfileViewModel extends ViewModel {
                     if(snapshot.hasChild("description")) {
                         setDescription(snapshot.child("description").getValue(String.class));
                     }
-                    if(snapshot.hasChild("email")) {
-                        setEmail(snapshot.child("email").getValue(String.class));
+                    if(snapshot.hasChild("userName")) {
+                        setUserName(snapshot.child("userName").getValue(String.class));
                     }
                     if(snapshot.hasChild("tags")) {
                         DataSnapshot tagsSnapshot = snapshot.child("tags");
@@ -250,11 +250,11 @@ public class ProfileViewModel extends ViewModel {
         this.description = description;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

@@ -4,7 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.media.Image;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -44,9 +47,11 @@ public class Register extends AppCompatActivity {
     private EditText emailET;
     private EditText pwET;
     private EditText pwConfirmET;
+    private EditText userNameET;
     private Button registerBT;
     private Spinner imageSpinner;
     private Integer profilePicSelected;
+    private EditText usernameET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,11 +67,13 @@ public class Register extends AppCompatActivity {
             startActivity(intent);
         }
 
+        usernameET = findViewById(R.id.userNameET);
         pwConfirmIV = findViewById(R.id.pwConfirmIV);
         emailET = findViewById(R.id.emailAddressET);
         pwET = findViewById(R.id.passwordET);
         pwConfirmET = findViewById(R.id.pwConfirmET);
         registerBT = findViewById(R.id.registerBT);
+        userNameET = findViewById(R.id.userNameET);
         imageSpinner = findViewById(R.id.spinnerIV);
 
         Integer[] images = {R.drawable.anger, R.drawable.sad, R.drawable.sob, R.drawable.shock, R.drawable.blush};
@@ -117,7 +124,8 @@ public class Register extends AppCompatActivity {
         registerBT.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createUserAccount(emailET.getText().toString(), pwET.getText().toString(), pwConfirmET.getText().toString());
+                createUserAccount(emailET.getText().toString(), pwET.getText().toString(),
+                        pwConfirmET.getText().toString(),usernameET.getText().toString());
             }
         });
     }
@@ -128,11 +136,13 @@ public class Register extends AppCompatActivity {
         outState.putString("email", emailET.getText().toString());
         outState.putString("password", pwET.getText().toString());
         outState.putString("passwordConfirm", pwConfirmET.getText().toString());
+        outState.putString("username", userNameET.getText().toString());
     }
 
-    private void createUserAccount(String email, String password, String confirmPassword) {
-        if (email == null || password == null || confirmPassword == null || email.equals("") || password.equals("") || confirmPassword.equals("") || profilePicSelected == null) {
-            Toast.makeText(Register.this, "Register failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
+    private void createUserAccount(String email, String password, String confirmPassword, String username) {
+        if (email == null || password == null || confirmPassword == null || email.equals("") || password.equals("")
+                || confirmPassword.equals("") || profilePicSelected == null || username.equals("") || username == null) {
+          Toast.makeText(Register.this, "Register failed. Please make sure to enter an email and password.", Toast.LENGTH_SHORT).show();
         } else {
             mAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
@@ -147,7 +157,9 @@ public class Register extends AppCompatActivity {
 
                                 Map<String, Object> updates = new HashMap<>();
                                 updates.put("profilePicResource",profilePicSelected);
+
                                 updates.put("email",user.getEmail());
+                                updates.put("userName",username);
 
                                 reference.child(user.getUid()).updateChildren(updates, new DatabaseReference.CompletionListener() {
                                     @Override
@@ -183,6 +195,4 @@ public class Register extends AppCompatActivity {
                     });
         }
     }
-
-
 }

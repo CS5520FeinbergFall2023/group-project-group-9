@@ -21,6 +21,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.model.Review;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewViewHolder> {
@@ -61,7 +62,10 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
                 // Handle errors here
             }
         });
-        holder.userIdTextView.setText(userId);
+
+        // set username
+        setProfileUsername(holder, userId);
+
         holder.contentTextView.setText(review.getContent());
         holder.ratingTextView.setText(String.valueOf(review.getRating()));
         Instant instant = Instant.ofEpochMilli(review.getTimestamp());
@@ -72,6 +76,25 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         // If to use Glide or Picasso, load image here
         // Glide.with(holder.avatarImageView.getContext()).load(review.getAvatarUri()).into(holder.avatarImageView);
     }
+
+    private void setProfileUsername(ReviewViewHolder holder, String userID) {
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(userID)
+                .child("userName");
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                holder.userIdTextView.setText(snapshot.getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
 
     @Override
     public int getItemCount() {

@@ -52,7 +52,7 @@ public class EditProfileViewModel extends ViewModel {
 
             Map<String, Object> updates = new HashMap<>();
 
-            updates.put("imageResource", profilePictureResource);
+            updates.put("profilePicResource", profilePictureResource);
             updates.put("description", description);
 
             reference.updateChildren(updates, new DatabaseReference.CompletionListener() {
@@ -104,8 +104,8 @@ public class EditProfileViewModel extends ViewModel {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(snapshot.exists()) {
-                    if(snapshot.hasChild("imageResource")) {
-                        profilePictureResource = snapshot.child("imageResource").getValue(Integer.class);
+                    if(snapshot.hasChild("profilePicResource")) {
+                        profilePictureResource = snapshot.child("profilePicResource").getValue(Integer.class);
                     } else {
 
                     }

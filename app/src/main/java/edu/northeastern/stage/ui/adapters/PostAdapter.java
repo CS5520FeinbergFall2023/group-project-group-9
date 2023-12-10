@@ -80,7 +80,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // friend
         if (viewType.equals("friend")) {
             if (visibilityState.equals("private")) {
-                holder.itemView.setVisibility(View.GONE);
+                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
             }
@@ -88,7 +88,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
         // stranger
         if (viewType.equals("stranger")) {
             if (!visibilityState.equals("public")) {
-                holder.itemView.setVisibility(View.GONE);
+                holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
             } else {
                 holder.itemView.setVisibility(View.VISIBLE);
             }
@@ -119,6 +119,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
             v.getContext().startActivity(i);
         });
 
+        // update username
+        setProfileUsername(holder, post);
+
         //display artist and track name
         holder.tvTrackName.setText(post.getTrackName());
         holder.tvArtistName.setText(post.getArtistName());
@@ -146,6 +149,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 //            Intent intent = new Intent(context, ProfileFragment.class);
 //            intent.putExtra("PROFILE_OWNER_ID", post.getOwnerID());
 //            context.startActivity(intent);
+        });
+    }
+
+    private void setProfileUsername(PostViewHolder holder, Post post) {
+        String ownerID = post.getOwnerID();
+        DatabaseReference reference = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(ownerID)
+                .child("userName");
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                holder.tvUserName.setText(snapshot.getValue().toString());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
         });
     }
 
@@ -334,12 +356,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostViewHolder
 
     public static class PostViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvPostContent, tvTrackName, tvArtistName, tvTimestamp;
+        TextView tvPostContent, tvTrackName, tvArtistName, tvTimestamp, tvUserName;
         ImageView ivUserAvatar, ivLike, visibleState, tvMusicImage;
         LinearLayout songCard;
 
         public PostViewHolder(View itemView) {
             super(itemView);
+            tvUserName = itemView.findViewById(R.id.tvUserName);
             tvPostContent = itemView.findViewById(R.id.tvPostContent);
             ivUserAvatar = itemView.findViewById(R.id.ivUserAvatar);
             ivLike = itemView.findViewById(R.id.ivLike);

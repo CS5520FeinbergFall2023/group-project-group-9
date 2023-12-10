@@ -16,10 +16,7 @@ public class Circle {
     public RectF oval;
     public Paint paint;
 
-
-
     // Constructor
-
     @SuppressLint("ResourceAsColor")
     public Circle(float x, float y, float radius) {
         this.x = x;

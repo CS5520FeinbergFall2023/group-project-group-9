@@ -36,9 +36,7 @@ public class CircleView extends View {
 
     Map<Circle, String> circleTextMap = new HashMap<>();
 
-
     ScaleGestureDetector objScaleGestureDetector;
-
 
     // Constructors for XML inflation
     public CircleView(Context context) {
@@ -52,7 +50,6 @@ public class CircleView extends View {
         Log.d("CIRCLEVIEW", "circleview context + attrs");
         init();
     }
-
 
     public CircleView(Context context, AttributeSet attrs, List<Circle> circles, int defStyle) {
         super(context, attrs, defStyle);
@@ -84,9 +81,8 @@ public class CircleView extends View {
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
 
-        countDraw ++;
+        countDraw++;
 //        canvas.clipRect(0, 0, getWidth(), getHeight());
-
 
         super.onDraw(canvas);
         Log.d("CIRCLEVIEW", "on draw count " + countDraw);

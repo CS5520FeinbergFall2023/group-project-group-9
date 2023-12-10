@@ -13,6 +13,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -36,24 +37,19 @@ public class MusicReviewViewModel extends ViewModel {
 
         List<Review> currentReviews = new ArrayList<>();
 
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        Query reviewQuery = userRef.orderByChild("reviews/trackID").equalTo(track.getId());
+        reviewQuery.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot user : snapshot.getChildren()) {
-                    DataSnapshot reviewsSnapshot = user.child("reviews");
-
-                    for (DataSnapshot reviewSnapshot : reviewsSnapshot.getChildren()) {
-                        String reviewUserID = reviewSnapshot.child("userID").getValue(String.class); // Get the userID for each review
-                        Review review = new Review(reviewUserID,
-                                reviewSnapshot.child("content").getValue().toString(),
-                                Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
-                                Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
-                                reviewSnapshot.child("trackID").getValue().toString());
-                        currentReviews.add(review);
-                    }
+                for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                    String reviewUserID = reviewSnapshot.child("userID").getValue(String.class); // Get the userID for each review
+                    Review review = new Review(reviewUserID,
+                            reviewSnapshot.child("content").getValue().toString(),
+                            Float.parseFloat(reviewSnapshot.child("rating").getValue().toString()),
+                            Long.parseLong(reviewSnapshot.child("timestamp").getValue().toString()),
+                            reviewSnapshot.child("trackID").getValue().toString());
+                    currentReviews.add(review);
                 }
-
-                // descending timestamp order
                 Collections.sort(currentReviews, new Comparator<Review>() {
                     @Override
                     public int compare(Review o1, Review o2) {
@@ -68,6 +64,7 @@ public class MusicReviewViewModel extends ViewModel {
 
             }
         });
+
     }
 
     // Method to add review

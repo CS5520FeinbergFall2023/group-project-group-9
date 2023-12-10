@@ -75,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:text="TrackName"
                         style="@style/TextStyle"
-                        android:textSize="15dp"
+                        android:textSize="13dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                     <TextView
@@ -84,6 +84,7 @@
                         android:layout_height="wrap_content"
                         android:text="ArtistName"
                         style="@style/TextStyle"
+                        android:textSize="10dp"
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
                 </LinearLayout>
             </LinearLayout>

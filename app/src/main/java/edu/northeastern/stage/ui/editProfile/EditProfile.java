@@ -65,15 +65,6 @@ public class EditProfile extends AppCompatActivity {
         // set up observers
         setupObservers();
 
-        // button save
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                viewModel.updateDatabase();
-                // TODO: need to intent back to profile page
-            }
-        });
-
         // set spinner to images
         Integer[] images = {R.drawable.anger, R.drawable.sad, R.drawable.sob, R.drawable.shock, R.drawable.blush};
         ImageAdapter adapter = new ImageAdapter(this, images);
@@ -161,6 +152,7 @@ public class EditProfile extends AppCompatActivity {
                         @Override
                         public void onClick(View v) {
                             viewModel.updateDatabase();
+                            finish();
                         }
                     });
                 });

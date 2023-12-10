@@ -4,11 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,7 +12,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -25,16 +20,12 @@ import android.widget.TextView;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.stage.MainActivity;
-import edu.northeastern.stage.R;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
-import edu.northeastern.stage.model.music.Album;
-import edu.northeastern.stage.model.music.Artist;
 import edu.northeastern.stage.model.music.Track;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.ExploreViewModel;
@@ -159,14 +150,15 @@ public class ExploreFragment extends Fragment {
                         Log.d("ExploreFragment", "afterTextChanged - Performing search for: " + s.toString());
                         viewModel.performSearch(s.toString())
                                 .observe(getViewLifecycleOwner(), searchResults -> {
-                                    searchAdapter.clear();
                                     Log.d("ExploreFragment", "afterTextChanged - SEARCH RESULTS ->  " + searchResults);
+
+                                    List<JsonObject> results = new ArrayList<>();
 
                                     for (int i = 0; i < searchResults.size(); i++) {
                                         Log.d("ExploreFragment", "afterTextChanged - LOOP " + searchResults.get(i).get("name").getAsString() + " BY " + searchResults.get(i).getAsJsonArray("artists").get(0).getAsJsonObject().get("name").getAsString());
-                                        searchAdapter.add(searchResults.get(i).getAsJsonObject());
+                                        results.add(searchResults.get(i).getAsJsonObject());
                                     }
-                                    searchAdapter.notifyDataSetChanged();
+                                    searchAdapter.setSelectedResult(results);
                                 });
                     }
                 } catch (Exception e) {

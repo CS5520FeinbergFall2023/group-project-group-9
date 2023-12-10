@@ -18,7 +18,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
 import edu.northeastern.stage.R;
 
 public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
@@ -29,7 +32,7 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
     Context context;
 
     public TrackSearchAdapter(Context context, AutoCompleteTextView songSearchACTV) {
-        super(context, 0);
+        super(context, 0, new ArrayList<>());
         Log.d("TrackSearchAdapter", "Constructor called");
         this.context = context;
         inflater = LayoutInflater.from(context);
@@ -49,7 +52,7 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         }
 
         JsonObject result = getItem(position);
-        Log.d("TrackSearchAdapter", "Result size: " + result.size());
+        Log.d("TrackSearchAdapter", "Position: " + position);
 
         if(result != null) {
             Log.d("TrackSearchAdapter", "getView - RESULT NOT NULL");
@@ -61,12 +64,24 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         return convertView;
     }
 
-    public JsonObject getSelectedResult() {
-        return selectedResult;
+    public void setSelectedResult(List<JsonObject> selectedResults) {
+        clear();
+        if(selectedResults != null) {
+            addAll(selectedResults);
+            notifyDataSetChanged();
+            Log.d("TrackSearchAdapter", "Adapter size after addAll: " + getCount());
+        }
     }
 
-    public void setSelectedResult(JsonObject selectedResult) {
-        this.selectedResult = selectedResult;
+    @Override
+    public int getCount() {
+        return super.getCount();
+    }
+
+    @Nullable
+    @Override
+    public JsonObject getItem(int position) {
+        return super.getItem(position);
     }
 
     private static class ViewHolder {
@@ -83,7 +98,7 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
         void bind(Context context, JsonObject result) {
 
             try {
-                Log.d("TrackSearchAdapter", "bind - Binding result: " + result);
+                Log.d("TrackSearchAdapter", "bind - Binding result: " + result.get("name").getAsString());
                 String artists = "";
                 String imageURL = "";
                 trackTitleTV.setText("");
@@ -93,7 +108,6 @@ public class TrackSearchAdapter extends ArrayAdapter<JsonObject> {
                 trackTitleTV.setText(result.get("name").getAsString());
 
                 JsonArray artistsArray = result.getAsJsonArray("artists");
-                Log.d("TrackSearchAdapter", "bind - Binding result: " + artistsArray.size());
 
                 if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
                     StringBuilder artistsSB = new StringBuilder();

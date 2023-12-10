@@ -20,6 +20,7 @@ import edu.northeastern.stage.model.Post;
 import edu.northeastern.stage.databinding.FragmentProfileBinding;
 import edu.northeastern.stage.ui.adapters.RecentListenedAdapter;
 import edu.northeastern.stage.ui.adapters.TagsAdapter;
+import edu.northeastern.stage.ui.authentication.Login;
 import edu.northeastern.stage.ui.editProfile.EditProfile;
 import edu.northeastern.stage.ui.viewmodels.ProfileViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -28,6 +29,8 @@ import android.content.Intent;
 
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,11 +47,21 @@ public class ProfileFragment extends Fragment {
     private List<Post> posts;
     private List<String> recentlyListenedToImageURLs;
 
-    // TODO: need to set onClick for follow/unfollow button
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         binding = FragmentProfileBinding.inflate(inflater, container, false);
+
+        // initialize variables
+        posts = new ArrayList<>();
+        recentlyListenedToImageURLs = new ArrayList<>();
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         // initialize view models
         viewModel = new ViewModelProvider(requireActivity()).get(ProfileViewModel.class);
@@ -100,27 +113,27 @@ public class ProfileFragment extends Fragment {
                     showEditProfileButtonOrFollowButton(followedStatus);
                 });
 
-
+                //set up logout button
+                binding.LogOutButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(requireContext(), Login.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+                        mAuth.signOut(); // use this to sign out
+                        startActivity(intent);
+                    }
+                });
             }
         });
 
-        // initialize variables
-        posts = new ArrayList<>();
-        recentlyListenedToImageURLs = new ArrayList<>();
-
-        return binding.getRoot();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
         viewModel.reset();
     }
 
     private void setUIValues() {
         binding.description.setText(viewModel.getDescription());
         binding.profileImage.setImageResource(viewModel.getProfilePicResource());
-        binding.userName.setText(viewModel.getEmail());
+        binding.userName.setText(viewModel.getUserName());
         for(Post post : posts) {
             recentlyListenedToImageURLs.add(post.getImageURL());
         }
@@ -182,7 +195,7 @@ public class ProfileFragment extends Fragment {
             }
         }
     }
-
+    
     private void launchEditProfile() {
         Intent intent = new Intent(getActivity(), EditProfile.class);
         startActivity(intent);

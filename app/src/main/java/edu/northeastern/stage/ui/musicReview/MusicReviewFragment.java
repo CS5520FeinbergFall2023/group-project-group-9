@@ -92,7 +92,12 @@ public class MusicReviewFragment extends Fragment {
 //                  .placeholder(R.drawable.placeholder_image) // Set a placeholder image
 //                  .error(R.drawable.error_image) // Set an error image
                         .into(binding.albumCoverImageView);
+
+                // fetch all reviews for this track
+                mViewModel.fetchReviews(); // fetch all reviews
             }
+
+
         });
 
         musicAttributesTextView = binding.musicAttributesTextView;
@@ -136,12 +141,6 @@ public class MusicReviewFragment extends Fragment {
         });
 
         return root;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mViewModel.fetchReviews(); // fetch all reviews
     }
 
     private void gotoUrl(String s) {

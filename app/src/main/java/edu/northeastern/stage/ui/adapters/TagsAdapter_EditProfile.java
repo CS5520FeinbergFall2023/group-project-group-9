@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import edu.northeastern.stage.R;
+import edu.northeastern.stage.model.Post;
 
 public class TagsAdapter_EditProfile extends RecyclerView.Adapter<TagsAdapter_EditProfile.ViewHolder> {
     private List<String> tagsList;
