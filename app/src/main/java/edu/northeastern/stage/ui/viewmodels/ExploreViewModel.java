@@ -301,7 +301,7 @@ public class ExploreViewModel extends ViewModel {
 
                 if (!isOverlapping) {
                     track = allTracksForCircleView.getValue().get(currentCircleSize);
-                    Circle c = new Circle(x, y, radius);
+                    Circle c = new Circle(x, y, radius, track);
                     String textInCircle = "";
                     textInCircle = allTracksForCircleView.getValue().get(currentCircleSize).get("name").getAsString() + "//";
                     textInCircle += "by//";

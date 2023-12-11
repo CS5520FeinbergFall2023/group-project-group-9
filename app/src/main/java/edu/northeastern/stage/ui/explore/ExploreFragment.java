@@ -143,6 +143,9 @@ public class ExploreFragment extends Fragment {
 
                                 binding.circleView.setCircleClickListener(clickedTrack -> {
                                     viewModel.setClickedTrack(clickedTrack);
+                                    Track trackToStore = viewModel.createTrack(clickedTrack); // create track in view model
+                                    sharedDataViewModel.setTrackReview(trackToStore); // set track in shared data view model
+                                    ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
                                 });
                             }
                         });
