@@ -142,7 +142,7 @@ public class CircleView extends View {
 
         velocities = new float[circles.length * 2]; // x and y velocities for each circle
         // Update circle positions based on velocities
-//        updateCirclePositions(canvas);
+        updateCirclePositions(canvas);
 
         canvas.save();
         canvas.concat(matrix);
@@ -171,76 +171,191 @@ public class CircleView extends View {
         return maxWidth;
     }
 
-    private void updateCirclePositions(Canvas canvas) {
+    private float[] transformPoint(float x, float y) {
+        float[] point = new float[]{x, y};
+        matrix.mapPoints(point);
+        return point;
+    }
 
-        //moving and also bouncing off of each other
+    private void enforceBoundary(Circle circle, int index) {
+        float[] transformed = transformPoint(circle.getX(), circle.getY());
+        float radius = circle.getRadius() * scaleFactor;
+
+        // Check left and right boundaries
+        if (transformed[0] - radius < 0) {
+            circle.setX(circle.getX() + (0 - (transformed[0] - radius)));
+            velocities[index * 2] *= -1; // Reverse x velocity
+        } else if (transformed[0] + radius > getWidth()) {
+            circle.setX(circle.getX() - ((transformed[0] + radius) - getWidth()));
+            velocities[index * 2] *= -1; // Reverse x velocity
+        }
+
+        // Check top and bottom boundaries
+        if (transformed[1] - radius < 0) {
+            circle.setY(circle.getY() + (0 - (transformed[1] - radius)));
+            velocities[index * 2 + 1] *= -1; // Reverse y velocity
+        } else if (transformed[1] + radius > getHeight()) {
+            circle.setY(circle.getY() - ((transformed[1] + radius) - getHeight()));
+            velocities[index * 2 + 1] *= -1; // Reverse y velocity
+        }
+    }
+
+    private void updateCirclePositions(Canvas canvas) {
         for (int i = 0; i < circles.length; i++) {
             Circle c1 = circles[i];
-            //Move first
             c1.move(canvas);
-            //Draw them
-//            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
 
-//            Update circle position based on velocity
+            // Update positions
             c1.setX(c1.getX() + velocities[i * 2]);
             c1.setY(c1.getY() + velocities[i * 2 + 1]);
 
-            // Boundary check
-            if(c1.getX() - c1.getRadius() < 0 ||
-                    c1.getX() + c1.getRadius() > getWidth()) {
-                // Flip x velocity
-                velocities[i*2] *= -1;
-            }
+            // Enforce boundary constraints and reverse direction if needed
+            enforceBoundary(c1, i);
 
-            if(c1.getY() - c1.getRadius() < 0 ||
-                    c1.getY() + c1.getRadius() > getHeight()) {
-                // Flip y velocity
-                velocities[i*2 + 1] *= -1;
-            }
+            // Apply friction to slow down gradually
+//            velocities[i * 2] *= FRICTION;
+//            velocities[i * 2 + 1] *= FRICTION;
 
             // Check for collisions with other circles
             for (int j = i + 1; j < circles.length; j++) {
                 Circle c2 = circles[j];
-                handleCollision(c1, c2, i, j, canvas);
+                handleCollision(c1, c2, i, j);
             }
         }
         invalidate();
     }
 
-    private void handleCollision(Circle c1, Circle c2, int index1, int index2, Canvas canvas) {
-        float dx = c2.getX() - c1.getX();
-        float dy = c2.getY() - c1.getY();
+    private void handleCollision(Circle c1, Circle c2, int index1, int index2) {
+        float[] pos1 = transformPoint(c1.getX(), c1.getY());
+        float[] pos2 = transformPoint(c2.getX(), c2.getY());
+
+        float radius1 = c1.getRadius() * scaleFactor;
+        float radius2 = c2.getRadius() * scaleFactor;
+
+        float dx = pos2[0] - pos1[0];
+        float dy = pos2[1] - pos1[1];
         float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-        if (distance < c1.getRadius() + c2.getRadius()) {
-            // Circles are colliding, adjust their velocities for bouncing effect
-            float angle = (float) Math.atan2(dy, dx);
-            float cosAngle = (float) Math.cos(angle);
-            float sinAngle = (float) Math.sin(angle);
+        float overlap = (radius1 + radius2 - distance) + 3;
 
-            // Calculate new velocities for both circles
-            float v1n = velocities[index1 * 2] * cosAngle + velocities[index1 * 2 + 1] * sinAngle;
-            float v1t = -velocities[index1 * 2] * sinAngle + velocities[index1 * 2 + 1] * cosAngle;
+        if (distance < radius1 + radius2) {
+            // Exchange velocities
+            float tempVelX = velocities[index1 * 2];
+            float tempVelY = velocities[index1 * 2 + 1];
 
-            float v2n = velocities[index2 * 2] * cosAngle + velocities[index2 * 2 + 1] * sinAngle;
-            float v2t = -velocities[index2 * 2] * sinAngle + velocities[index2 * 2 + 1] * cosAngle;
+            velocities[index1 * 2] = velocities[index2 * 2];
+            velocities[index1 * 2 + 1] = velocities[index2 * 2 + 1];
 
-            // Swap normal velocities (bounce off each other)
-            velocities[index1 * 2] = v2n * cosAngle - v1t * sinAngle;
-            velocities[index1 * 2 + 1] = v2n * sinAngle + v1t * cosAngle;
+            velocities[index2 * 2] = tempVelX;
+            velocities[index2 * 2 + 1] = tempVelY;
 
-            velocities[index2 * 2] = v1n * cosAngle - v2t * sinAngle;
-            velocities[index2 * 2 + 1] = v1n * sinAngle + v2t * cosAngle;
+            // Move circles slightly away from each other to avoid sticking together
+            dx /= distance;
+            dy /= distance;
 
-            // Move circles slightly away to avoid continuous collisions
-            float overlap = (c1.getRadius() + c2.getRadius() - distance) / 2;
-            c1.setX(c1.getX() - overlap * cosAngle);
-            c1.setY(c1.getY() - overlap * sinAngle);
+            c1.setX(c1.getX() - overlap * dx);
+            c1.setY(c1.getY() - overlap * dy);
 
-            c2.setX(c2.getX() + overlap * cosAngle);
-            c2.setY(c2.getY() + overlap * sinAngle);
+            c2.setX(c2.getX() + overlap * dx);
+            c2.setY(c2.getY() + overlap * dy);
+        }
+
+        float newDx = c2.getX() - c1.getX();
+        float newDy = c2.getY() - c1.getY();
+        float newDistance = (float) Math.sqrt(newDx * newDx + newDy * newDy);
+
+        if (newDistance < radius1 + radius2) {
+            float tempVelX = velocities[index1 * 2];
+            float tempVelY = velocities[index1 * 2 + 1];
+
+            velocities[index1 * 2] = velocities[index2 * 2];
+            velocities[index1 * 2 + 1] = velocities[index2 * 2 + 1];
+
+            velocities[index2 * 2] = tempVelX;
+            velocities[index2 * 2 + 1] = tempVelY;
+
+            // Move circles slightly away from each other to avoid sticking together
+            newDx /= distance;
+            newDy /= distance;
+
+            c1.setX(c1.getX() - overlap * newDx);
+            c1.setY(c1.getY() - overlap * newDy);
+
+            c2.setX(c2.getX() + overlap * newDx);
+            c2.setY(c2.getY() + overlap * newDy);
         }
     }
+
+//    private void updateCirclePositions(Canvas canvas) {
+//
+//        //moving and also bouncing off of each other
+//        for (int i = 0; i < circles.length; i++) {
+//            Circle c1 = circles[i];
+//            //Move first
+//            c1.move(canvas);
+//            //Draw them
+////            canvas.drawCircle(c1.getX(), c1.getY(), c1.getRadius(), c1.paint);
+//
+////            Update circle position based on velocity
+//            c1.setX(c1.getX() + velocities[i * 2]);
+//            c1.setY(c1.getY() + velocities[i * 2 + 1]);
+//
+//            // Boundary check
+//            if(c1.getX() - c1.getRadius() < 0 ||
+//                    c1.getX() + c1.getRadius() > getWidth()) {
+//                // Flip x velocity
+//                velocities[i*2] *= -1;
+//            }
+//
+//            if(c1.getY() - c1.getRadius() < 0 ||
+//                    c1.getY() + c1.getRadius() > getHeight()) {
+//                // Flip y velocity
+//                velocities[i*2 + 1] *= -1;
+//            }
+//
+//            // Check for collisions with other circles
+//            for (int j = i + 1; j < circles.length; j++) {
+//                Circle c2 = circles[j];
+//                handleCollision(c1, c2, i, j, canvas);
+//            }
+//        }
+//        invalidate();
+//    }
+//
+//    private void handleCollision(Circle c1, Circle c2, int index1, int index2, Canvas canvas) {
+//        float dx = c2.getX() - c1.getX();
+//        float dy = c2.getY() - c1.getY();
+//        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+//
+//        if (distance < c1.getRadius() + c2.getRadius()) {
+//            // Circles are colliding, adjust their velocities for bouncing effect
+//            float angle = (float) Math.atan2(dy, dx);
+//            float cosAngle = (float) Math.cos(angle);
+//            float sinAngle = (float) Math.sin(angle);
+//
+//            // Calculate new velocities for both circles
+//            float v1n = velocities[index1 * 2] * cosAngle + velocities[index1 * 2 + 1] * sinAngle;
+//            float v1t = -velocities[index1 * 2] * sinAngle + velocities[index1 * 2 + 1] * cosAngle;
+//
+//            float v2n = velocities[index2 * 2] * cosAngle + velocities[index2 * 2 + 1] * sinAngle;
+//            float v2t = -velocities[index2 * 2] * sinAngle + velocities[index2 * 2 + 1] * cosAngle;
+//
+//            // Swap normal velocities (bounce off each other)
+//            velocities[index1 * 2] = v2n * cosAngle - v1t * sinAngle;
+//            velocities[index1 * 2 + 1] = v2n * sinAngle + v1t * cosAngle;
+//
+//            velocities[index2 * 2] = v1n * cosAngle - v2t * sinAngle;
+//            velocities[index2 * 2 + 1] = v1n * sinAngle + v2t * cosAngle;
+//
+//            // Move circles slightly away to avoid continuous collisions
+//            float overlap = (c1.getRadius() + c2.getRadius() - distance) / 2;
+//            c1.setX(c1.getX() - overlap * cosAngle);
+//            c1.setY(c1.getY() - overlap * sinAngle);
+//
+//            c2.setX(c2.getX() + overlap * cosAngle);
+//            c2.setY(c2.getY() + overlap * sinAngle);
+//        }
+//    }
 
     public void setCircles(List<Circle> circles, HashMap<Circle, String> circleTextMap) {
         Log.d("CIRCLEVIEW", "set circles TEXT PRESENT");
