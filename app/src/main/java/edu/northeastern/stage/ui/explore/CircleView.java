@@ -38,7 +38,6 @@ public class CircleView extends View {
     private boolean isDragging = false;
     Integer countDraw = 0;
     private float[] velocities;
-    Boolean textPresent = false;
 
     private CircleClickListener listener;
 
@@ -106,7 +105,6 @@ public class CircleView extends View {
             // Draw each circle on the canvas
             for (Circle c : circles) {
 
-                if(textPresent){
                     // Set random text size based on circle radius
                     float textSize = c.getRadius() / 4;
                     paint.setTextSize(textSize);
@@ -132,7 +130,6 @@ public class CircleView extends View {
                         canvas.drawText(line, textX, textY, paint);
                         textY += fontMetrics.descent; // Move down to the next line
                     }
-                }
 
                 canvas.save();
                 // Draw circle with black border
@@ -142,7 +139,7 @@ public class CircleView extends View {
 
         velocities = new float[circles.length * 2]; // x and y velocities for each circle
         // Update circle positions based on velocities
-//        updateCirclePositions(canvas);
+        updateCirclePositions(canvas);
 
         canvas.save();
         canvas.concat(matrix);
@@ -247,7 +244,6 @@ public class CircleView extends View {
 
         this.circles = circles.toArray(new Circle[0]);
         this.circleTextMap = circleTextMap;
-        this.textPresent = true;
 
         invalidate(); // Request a redraw
     }
@@ -257,7 +253,6 @@ public class CircleView extends View {
 
         this.circles = circles.toArray(new Circle[0]);
         this.circleTextMap = circleTextMap;
-        this.textPresent = false;
 
         invalidate(); // Request a redraw
     }
@@ -270,54 +265,6 @@ public class CircleView extends View {
         canvas.drawText("+", getWidth() - 80, getHeight() - 80, controlsPaint);
         canvas.drawText("-", getWidth() - 70, getHeight() - 20, controlsPaint);
     }
-
-
-    //include the + & - back again after fixing the canvas touch that makes the circles disappear (rectangle border remains)
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        float touchX = event.getX();
-//        float touchY = event.getY();
-//
-//        Log.d("CIRCLEVIEW", "Touch event: " + event.getAction());
-////        toastmsg("In onTouchEvent ->" + Thread.activeCount());
-//
-//        switch (event.getAction()) {
-//            case MotionEvent.ACTION_DOWN:
-//                Log.d("CIRCLEVIEW", "ACTION_DOWN");
-//                lastTouchX = touchX;
-//                lastTouchY = touchY;
-//                isDragging = true;
-//                break;
-//
-//            case MotionEvent.ACTION_MOVE:
-//
-//                if (isDragging) {
-//                    Log.d("CIRCLEVIEW", "isDragging  in ACTION_MOVE");
-//
-//                    float dx = touchX - lastTouchX;
-//                    float dy = touchY - lastTouchY;
-//                    matrix.postTranslate(dx, dy);
-//                    invalidate();
-//                    lastTouchX = touchX;
-//                    lastTouchY = touchY;
-//                }
-//                break;
-//
-//            case MotionEvent.ACTION_UP:
-//                Log.d("CIRCLEVIEW", "ACTION_UP");
-//                checkCircleClick(touchX, touchY);
-//                break;
-//
-//            case MotionEvent.ACTION_CANCEL:
-//                Log.d("CIRCLEVIEW", "ACTION_CANCEL");
-//                isDragging = false;
-//                break;
-//        }
-//
-//        objScaleGestureDetector.onTouchEvent(event);
-//
-//        return true;
-//    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -407,7 +354,7 @@ public class CircleView extends View {
                 // Check if the touch point is within the bounds of the circle
                 if (isPointInsideCircle(touchX, touchY, c)) {
                     // Handle the circle click, for example, display a message or perform an action
-                    toastmsg("" + c + " text value is " + circleTextMap.get(c));
+//                    toastmsg("" + c + " text value is " + circleTextMap.get(c));
                     Log.d("CircleView", "Current selected track :  -> " + c.getTrackObject());
                     Log.d("CircleView", "Listener   -> " + listener);
 

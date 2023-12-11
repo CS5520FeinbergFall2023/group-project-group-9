@@ -91,7 +91,8 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-        viewModel.setCircles(circleView);
+        circleTracksSearch(25);
+//        viewModel.setCircles(circleView);
 
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -114,48 +115,48 @@ public class ExploreFragment extends Fragment {
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
-
-                viewModel.getTracksNearby(currentMileRadius).observe(getViewLifecycleOwner(),tracksFrequency -> {
-                    Log.d("ABC123","Current mile radius: " + String.valueOf(currentMileRadius));
-                    Log.d("ABC123","Tracks found - " + tracksFrequency.toString());
-                    Log.d("ABC123","Tracks found - " + tracksFrequency.size());
-                    Log.d("ABC123","Tracks found - " + tracksFrequency.get("2DqhE7xzpGNsKYbptqblJg"));
-
-//                    Set<String> a= tracksFrequency.keySet();
-//                    a.getClass()
-                    Integer trackSize = tracksFrequency.size();
-                    for (String key : tracksFrequency.keySet()) {
-                        Integer value = tracksFrequency.get(key);
-                        Log.d("ABC123", "key/value : " + key + " / " + value);
-
-                        viewModel.getTrackFromId(key, trackSize).observe(getViewLifecycleOwner(), allTrackObjects -> {
-
-                            if(allTrackObjects.size() == tracksFrequency.size()){
-                                Log.d("ABC123", "ALL TRACK OBJECTS RECEIVED " + allTrackObjects);
-
-                                circleView = binding.circleView;
-                                // Get keySet
-                                Set<String> keySet = tracksFrequency.keySet();
-
-                                // Convert to list
-                                List<String> keyList = new ArrayList<>(keySet);
-                                viewModel.setCirclesWithTracks(keyList, binding.circleView);
-
-                                binding.circleView.setCircleClickListener(clickedTrack -> {
-                                    viewModel.setClickedTrack(clickedTrack);
-                                    Track trackToStore = viewModel.createTrack(clickedTrack); // create track in view model
-                                    sharedDataViewModel.setTrackReview(trackToStore); // set track in shared data view model
-                                    ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
-                                });
-                            }
-                        });
-                    }
-                });
-
+                circleTracksSearch(currentMileRadius);
             }
         });
 
         return root;
+    }
+
+    public void circleTracksSearch(Integer currentMileRadius){
+        viewModel.getTracksNearby(currentMileRadius).observe(getViewLifecycleOwner(),tracksFrequency -> {
+            Log.d("ABC123","Current mile radius: " + String.valueOf(currentMileRadius));
+            Log.d("ABC123","Tracks found - " + tracksFrequency.toString());
+            Log.d("ABC123","Tracks found - " + tracksFrequency.size());
+            Log.d("ABC123","Tracks found - " + tracksFrequency.get("2DqhE7xzpGNsKYbptqblJg"));
+
+            Integer trackSize = tracksFrequency.size();
+            for (String key : tracksFrequency.keySet()) {
+                Integer value = tracksFrequency.get(key);
+                Log.d("ABC123", "key/value : " + key + " / " + value);
+
+                viewModel.getTrackFromId(key, trackSize).observe(getViewLifecycleOwner(), allTrackObjects -> {
+
+                    if(allTrackObjects.size() == tracksFrequency.size()){
+                        Log.d("ABC123", "ALL TRACK OBJECTS RECEIVED " + allTrackObjects);
+
+                        circleView = binding.circleView;
+                        // Get keySet
+                        Set<String> keySet = tracksFrequency.keySet();
+
+                        // Convert to list
+                        List<String> keyList = new ArrayList<>(keySet);
+                        viewModel.setCirclesWithTracks(keyList, binding.circleView);
+
+                        binding.circleView.setCircleClickListener(clickedTrack -> {
+                            viewModel.setClickedTrack(clickedTrack);
+                            Track trackToStore = viewModel.createTrack(clickedTrack); // create track in view model
+                            sharedDataViewModel.setTrackReview(trackToStore); // set track in shared data view model
+                            ((MainActivity)requireActivity()).navigateToFragment("MUSIC_REVIEW_FRAGMENT", true, null);
+                        });
+                    }
+                });
+            }
+        });
     }
 
     private void setupSearch() {

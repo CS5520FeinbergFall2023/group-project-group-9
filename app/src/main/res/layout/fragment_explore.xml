@@ -55,6 +55,7 @@
         android:layout_height="wrap_content"
         android:focusableInTouchMode="true"
         android:max="100"
+        android:progress="25"
         android:paddingStart="40dp"
         android:paddingEnd="40dp"
         android:progressDrawable="@drawable/progress_selector"
