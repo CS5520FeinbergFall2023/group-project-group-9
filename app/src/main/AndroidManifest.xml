@@ -40,21 +40,5 @@
             android:name=".ui.editProfile.EditProfile"
             android:exported="false">
         </activity>
-        <activity
-            android:name=".ui.adapters.TagsAdapter"
-            android:exported="false">
-        </activity>
-        <activity
-            android:name=".ui.profile.ProfileFragment"
-            android:exported="false">
-        </activity>
-        <activity
-            android:name=".ui.adapters.RecentListenedAdapter"
-            android:exported="false">
-        </activity>
-        <activity
-            android:name=".ui.viewmodels.ProfileViewModel"
-            android:exported="false">
-        </activity>
     </application>
 </manifest>
