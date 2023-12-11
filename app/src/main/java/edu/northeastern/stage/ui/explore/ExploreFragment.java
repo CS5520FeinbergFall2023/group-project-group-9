@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import edu.northeastern.stage.MainActivity;
@@ -124,26 +126,33 @@ public class ExploreFragment extends Fragment {
                 int delta = txtW / 2;
                 progressTextView.setX(geoSlider.getX() + thumbPos - delta);
 
-                viewModel.getTracksNearby(currentMileRadius).observe(getViewLifecycleOwner(), tracksFrequency -> {
-                    List<CompletableFuture<Void>> searchFutures = new ArrayList<>();
+                LiveData<Map<String, Integer>> tracksLiveData = viewModel.getTracksNearby(currentMileRadius);
+                tracksLiveData.observe(getViewLifecycleOwner(),tracksFrequency -> {
+                    Log.d("ABC123","CALLED");
 
-                    for (String key : tracksFrequency.keySet()) {
-                        CompletableFuture<Void> searchFuture = viewModel.searchTrack(key);
-                        searchFutures.add(searchFuture);
+                    if(tracksFrequency != null && !tracksFrequency.isEmpty()) {
+                        viewModel.setExploreTracks(new ArrayList<>());
+                        List<CompletableFuture<Void>> searchFutures = new ArrayList<>();
+
+                        for (String key : tracksFrequency.keySet()) {
+                            CompletableFuture<Void> searchFuture = viewModel.searchTrack(key);
+                            searchFutures.add(searchFuture);
+                        }
+
+                        CompletableFuture<Void>[] searchFuturesArray = searchFutures.toArray(new CompletableFuture[0]);
+
+                        CompletableFuture<Void> allOf = CompletableFuture.allOf(searchFuturesArray);
+
+                        allOf.thenRun(() -> {
+                            ArrayList<PopularityTrack> popularityTracks = viewModel.getExploreTracks();
+                            Comparator<PopularityTrack> popularityComparator = Comparator.comparingInt(PopularityTrack::getRanking).reversed();
+                            Collections.sort(popularityTracks, popularityComparator);
+                            viewModel.setExploreTracks(popularityTracks);
+                            adapter.setExploreList(viewModel.getExploreTracks());
+                            adapter.notifyDataSetChanged();
+                            tracksLiveData.removeObservers(getViewLifecycleOwner());
+                        });
                     }
-
-                    CompletableFuture<Void>[] searchFuturesArray = searchFutures.toArray(new CompletableFuture[0]);
-
-                    CompletableFuture<Void> allOf = CompletableFuture.allOf(searchFuturesArray);
-
-                    allOf.thenRun(() -> {
-                        ArrayList<PopularityTrack> popularityTracks = viewModel.getExploreTracks();
-                        Comparator<PopularityTrack> popularityComparator = Comparator.comparingInt(PopularityTrack::getRanking).reversed();
-                        Collections.sort(popularityTracks, popularityComparator);
-                        viewModel.setExploreTracks(popularityTracks);
-                        adapter.setExploreList(viewModel.getExploreTracks());
-                        adapter.notifyDataSetChanged();
-                    });
                 });
             }
         });
