@@ -15,6 +15,7 @@ import android.widget.Toast;
 import edu.northeastern.stage.MainActivity;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.google.gson.JsonObject;
 
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.northeastern.stage.MainActivity;
+import edu.northeastern.stage.R;
 import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.model.music.Track;
 
@@ -32,6 +34,7 @@ public class CircleView extends View {
     Circle[] circles;
     private Matrix matrix;
     private Paint paint;
+    private Paint textPaint;
     private float scaleFactor = 1.05f;
     private float lastTouchX;
     private float lastTouchY;
@@ -88,10 +91,16 @@ public class CircleView extends View {
         paint.setStrokeWidth(2);
         paint.setStyle(Paint.Style.STROKE);
 
+        textPaint = new Paint();
+        int greenColor = ContextCompat.getColor(getContext(), R.color.green);
+        textPaint.setColor(greenColor);
+        textPaint.setStyle(Paint.Style.FILL);
+        textPaint.setAntiAlias(true);
     }
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
+        canvas.drawColor(Color.rgb(245, 245, 220));
 
         countDraw++;
 //        canvas.clipRect(0, 0, getWidth(), getHeight());
@@ -105,6 +114,9 @@ public class CircleView extends View {
         if (circles != null) {
             // Draw each circle on the canvas
             for (Circle c : circles) {
+                int greenColor = ContextCompat.getColor(getContext(), R.color.medium_green_50);
+                paint.setColor(greenColor);
+                paint.setStyle(Paint.Style.FILL);
 
                 if(textPresent){
                     // Set random text size based on circle radius
@@ -129,7 +141,7 @@ public class CircleView extends View {
                         float textWidthCurr = paint.measureText(line);
                         float textX = c.getX() - (textWidthCurr / 2); // Center the text horizontally
                         textY += -fontMetrics.ascent; // Move text down by the ascent to position it correctly
-                        canvas.drawText(line, textX, textY, paint);
+                        canvas.drawText(line, textX, textY, textPaint);
                         textY += fontMetrics.descent; // Move down to the next line
                     }
                 }
