@@ -38,7 +38,7 @@ public class ExploreAdapter extends RecyclerView.Adapter<ExploreAdapter.ExploreV
         PopularityTrack track = exploreList.get(position);
         holder.tvTrackName.setText(track.getTrackName());
         holder.tvArtistName.setText(track.getArtistName());
-        holder.tvRanking.setText(track.getRanking().toString());
+        holder.tvRanking.setText("Frequency: " + track.getRanking().toString());
         Picasso.get()
                 .load(track.getAlbumImage())
                 .error(R.drawable.profile_recent_listened_error)

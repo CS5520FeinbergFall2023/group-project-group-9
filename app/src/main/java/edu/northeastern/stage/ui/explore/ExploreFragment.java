@@ -127,6 +127,7 @@ public class ExploreFragment extends Fragment {
                 progressTextView.setX(geoSlider.getX() + thumbPos - delta);
 
                 LiveData<Map<String, Integer>> tracksLiveData = viewModel.getTracksNearby(currentMileRadius);
+                tracksLiveData.removeObservers(getViewLifecycleOwner());
                 tracksLiveData.observe(getViewLifecycleOwner(),tracksFrequency -> {
                     Log.d("ABC123","CALLED");
 
@@ -148,8 +149,10 @@ public class ExploreFragment extends Fragment {
                             Comparator<PopularityTrack> popularityComparator = Comparator.comparingInt(PopularityTrack::getRanking).reversed();
                             Collections.sort(popularityTracks, popularityComparator);
                             viewModel.setExploreTracks(popularityTracks);
-                            adapter.setExploreList(viewModel.getExploreTracks());
-                            adapter.notifyDataSetChanged();
+                            requireActivity().runOnUiThread(() -> {
+                                adapter.setExploreList(viewModel.getExploreTracks());
+                                adapter.notifyDataSetChanged();
+                            });
                             tracksLiveData.removeObservers(getViewLifecycleOwner());
                         });
                     }
