@@ -8,6 +8,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.northeastern.stage.R;
@@ -16,6 +17,10 @@ public class TagsAdapter extends RecyclerView.Adapter<TagsAdapter.TagViewHolder>
 
     private List<String> tags;
 
+    public TagsAdapter() {
+        this.tags = new ArrayList<>();
+    }
+    // Existing constructor
     public TagsAdapter(List<String> tags) {
         this.tags = tags;
     }
