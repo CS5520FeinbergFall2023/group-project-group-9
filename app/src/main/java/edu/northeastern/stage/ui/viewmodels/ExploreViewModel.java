@@ -15,33 +15,66 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 
 import edu.northeastern.stage.API.Spotify;
-import edu.northeastern.stage.model.Circle;
 import edu.northeastern.stage.model.music.Album;
 import edu.northeastern.stage.model.music.Artist;
+import edu.northeastern.stage.model.music.PopularityTrack;
 import edu.northeastern.stage.model.music.Track;
-import edu.northeastern.stage.ui.explore.CircleView;
 
 public class ExploreViewModel extends ViewModel {
 
     private MutableLiveData<List<JsonObject>> recommendations = new MutableLiveData<>();
     private MutableLiveData<Map<String,Integer>> tracksFrequency = new MutableLiveData<>();
+    private ArrayList<PopularityTrack> exploreTracks = new ArrayList<>();
     private String track;
     private Spotify spotify = new Spotify();
-    private static final Random rand = new Random();
     private String userID;
-    CircleView circleView;
-    Map<Circle, String> circleTextMap = new HashMap<>();
-    List<Circle> circles;
     final private float METER_TO_MILES_CONVERSION = 0.000621371F;
+
+    // TODO: reset exploreTracks whenever there is a change to location bar
+    public CompletableFuture<Void> searchTrack(String trackID) {
+        CompletableFuture<Void> future = new CompletableFuture<>();
+
+        CompletableFuture<JsonObject> trackSearchFuture = spotify.trackSearchByID(trackID);
+        trackSearchFuture.thenAccept(searchResult -> {
+            String trackName = searchResult.get("name").getAsString();
+            String albumImageURL = searchResult.get("album").getAsJsonObject().getAsJsonArray("images").get(0).getAsJsonObject().get("url").getAsString();
+            String artistName = "";
+            JsonArray artistsArray = searchResult.getAsJsonArray("artists");
+            StringBuilder artistsSB = new StringBuilder();
+            if (artistsArray != null && !artistsArray.isJsonNull() && artistsArray.size() > 0) {
+                Iterator<JsonElement> iterator = artistsArray.iterator();
+
+                while (iterator.hasNext()) {
+                    artistsSB.append(iterator.next().getAsJsonObject().get("name").getAsString());
+
+                    if (iterator.hasNext()) {
+                        artistsSB.append(", ");
+                    }
+                }
+            }
+            artistName = artistsSB.toString();
+            PopularityTrack newTrack = new PopularityTrack(trackName, artistName, albumImageURL, tracksFrequency.getValue().get(trackID));
+            exploreTracks.add(newTrack);
+            future.complete(null); // Complete the CompletableFuture when the operation is finished.
+        }).exceptionally(e -> {
+            Log.e("TrackSearchError", e.getMessage());
+            future.completeExceptionally(e); // Complete exceptionally if an error occurs.
+            return null;
+        });
+
+        return future;
+    }
+
 
     public MutableLiveData<Map<String,Integer>> getTracksNearby(Integer radius) {
 
@@ -173,74 +206,11 @@ public class ExploreViewModel extends ViewModel {
         return recommendations;
     }
 
-    public void setCircles(CircleView circleView) {
-        // Process the circles as needed in the ViewModel
-        this.circleView = circleView;
-        createCircles();
+    public ArrayList<PopularityTrack> getExploreTracks() {
+        return exploreTracks;
     }
 
-    public List<Circle> createCircles() {
-        circles = new ArrayList<>();
-        int attempts = 0;
-        int maxAttempts = 100000; // Limit the number of attempts to avoid infinite loop
-        int MIN_DISTANCE_THRESHOLD = 10;
-
-        while (circles.size() < 20 && attempts < maxAttempts) {
-            float x = rand.nextFloat() * 2000 - 1000; //-1000 to 1000
-            float y = rand.nextFloat() * 2000 - 1000;
-            float radius = rand.nextFloat() * 200 + 100;
-
-            // Ensure the newly created circle doesn't overlap with existing circles
-            boolean isOverlapping = false;
-            for (Circle existingCircle : circles) {
-                float distance = calculateDistance(x, y, existingCircle.getX(), existingCircle.getY());
-                // add min_distance_threshold so they are bit further away from each other
-                float minDistance = radius + existingCircle.getRadius() + MIN_DISTANCE_THRESHOLD;
-                if (distance < minDistance) {
-                    isOverlapping = true;
-                    break; // This circle overlaps, generate a new one
-                }
-            }
-
-            if (!isOverlapping) {
-                circles.add(new Circle(x, y, radius));
-            }
-
-            attempts++;
-        }
-
-        generateCircleTexts();
-
-        // Set the circles to the existing CircleView
-        if (circleView != null) {
-            circleView.setCircles(circles, (HashMap<Circle, String>) circleTextMap);
-            circleView.invalidate(); // Request a redraw
-        }
-        return circles;
+    public void setExploreTracks(ArrayList<PopularityTrack> exploreTracks) {
+        this.exploreTracks = exploreTracks;
     }
-
-    private float calculateDistance(float x1, float y1, float x2, float y2) {
-        //euclidean distance
-        float dx = x2 - x1;
-        float dy = y2 - y1;
-        return (float) Math.sqrt(dx * dx + dy * dy);
-    }
-
-    private void generateCircleTexts(){
-        String textInCircle;
-        for(Circle c: circles){
-            textInCircle = generateRandomText();
-            // Store in map
-            circleTextMap.put(c, textInCircle);
-        }
-    }
-
-    // Function to generate random text
-    public String generateRandomText() {
-        // Replace this with your own logic to generate random text
-        String[] texts = {"Text1", "Text2", "Text3", "Text4", "Text5"};
-        int randomIndex = new Random().nextInt(texts.length);
-        return texts[randomIndex];
-    }
-
 }

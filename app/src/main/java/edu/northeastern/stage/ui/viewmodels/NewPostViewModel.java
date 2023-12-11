@@ -87,7 +87,6 @@ public class NewPostViewModel extends ViewModel {
             }
         }
         // Update the LiveData with the submission status
-        // TODO: what is the purpose of this?
         postSubmissionStatus.setValue(true); // Or false if submission fails
     }
 

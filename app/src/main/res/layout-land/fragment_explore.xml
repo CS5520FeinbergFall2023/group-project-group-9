@@ -21,7 +21,7 @@
         app:layout_constraintBottom_toTopOf="@+id/reviewButton"
         app:layout_constraintEnd_toEndOf="@id/reviewButton"
         app:layout_constraintStart_toStartOf="@id/reviewButton"
-        app:layout_constraintTop_toTopOf="@+id/circleView"
+        app:layout_constraintTop_toTopOf="@+id/popularPostsRV"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <Button
@@ -35,21 +35,21 @@
         app:layout_constraintBottom_toTopOf="@+id/locationSeekBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.328"
-        app:layout_constraintStart_toEndOf="@+id/circleView"
+        app:layout_constraintStart_toEndOf="@+id/popularPostsRV"
         app:layout_constraintTop_toBottomOf="@id/autoCompleteTextView" />
 
-    <edu.northeastern.stage.ui.explore.CircleView
-        android:id="@+id/circleView"
-        android:layout_width="350dp"
-        android:layout_height="220dp"
-        android:layout_marginRight="16dp"
-        android:background="#000000"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/popularPostsRV"
+        android:layout_width="400dp"
+        android:layout_height="300dp"
+        android:layout_margin="32dp"
+        android:padding="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reviewButton"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.496"
+        app:layout_constraintVertical_bias="0.5"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <SeekBar
@@ -62,7 +62,7 @@
         android:progressDrawable="@drawable/progress_selector"
         android:thumb="@drawable/map_marker"
         android:thumbOffset="0dp"
-        app:layout_constraintBottom_toBottomOf="@+id/circleView"
+        app:layout_constraintBottom_toBottomOf="@+id/popularPostsRV"
         app:layout_constraintEnd_toEndOf="@+id/reviewButton"
         app:layout_constraintStart_toStartOf="@+id/reviewButton"
         app:layout_constraintTop_toBottomOf="@id/reviewButton" />
@@ -72,7 +72,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0 miles"
-        app:layout_constraintBottom_toBottomOf="@+id/circleView"
+        app:layout_constraintBottom_toBottomOf="@+id/popularPostsRV"
         app:layout_constraintEnd_toEndOf="@+id/locationSeekBar"
         app:layout_constraintHorizontal_bias="0.028"
         app:layout_constraintStart_toStartOf="@+id/locationSeekBar"

@@ -4,7 +4,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -22,10 +25,16 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import edu.northeastern.stage.MainActivity;
 import edu.northeastern.stage.databinding.FragmentExploreBinding;
+import edu.northeastern.stage.model.music.PopularityTrack;
 import edu.northeastern.stage.model.music.Track;
+import edu.northeastern.stage.ui.adapters.ExploreAdapter;
 import edu.northeastern.stage.ui.adapters.TrackSearchAdapter;
 import edu.northeastern.stage.ui.viewmodels.ExploreViewModel;
 import edu.northeastern.stage.ui.viewmodels.SharedDataViewModel;
@@ -34,10 +43,11 @@ public class ExploreFragment extends Fragment {
 
     private FragmentExploreBinding binding;
     private ExploreViewModel viewModel;
+    private RecyclerView recyclerView;
+    private ExploreAdapter adapter;
     private JsonObject selectedTrack;
     private AutoCompleteTextView actv;
     private Button buttonToMusicReview;
-    private CircleView circleView;
     private SeekBar geoSlider;
     private TextView progressTextView;
     private SharedDataViewModel sharedDataViewModel;
@@ -51,11 +61,12 @@ public class ExploreFragment extends Fragment {
 
         // instantiate views
         buttonToMusicReview = binding.reviewButton;
-        circleView = binding.circleView;
         actv = binding.autoCompleteTextView;
         actv.setThreshold(1);
         geoSlider = binding.locationSeekBar;
         progressTextView = binding.textView;
+        recyclerView = binding.popularPostsRV;
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         // set up view models to share data
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
@@ -67,6 +78,10 @@ public class ExploreFragment extends Fragment {
                 viewModel.setUserID(userID);
             }
         });
+
+        // instantiate adapter
+        adapter = new ExploreAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
 
         //setup search
         setupSearch();
@@ -86,12 +101,18 @@ public class ExploreFragment extends Fragment {
             }
         });
 
-        viewModel.setCircles(circleView);
-
         // perform seek bar change listener event used for getting the progress value
         geoSlider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                currentMileRadius = progress;
+            }
+
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // TODO Auto-generated method stub
+            }
+
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                viewModel.setExploreTracks(new ArrayList<>());
+                currentMileRadius = seekBar.getProgress();
                 String progressText = currentMileRadius + " miles";
                 progressTextView.setText(progressText);
 
@@ -103,20 +124,28 @@ public class ExploreFragment extends Fragment {
                 int delta = txtW / 2;
                 progressTextView.setX(geoSlider.getX() + thumbPos - delta);
 
-                viewModel.getTracksNearby(currentMileRadius).observe(getViewLifecycleOwner(),tracksFrequency -> {
-                    Log.d("ABC123","Current mile radius: " + String.valueOf(currentMileRadius));
-                    Log.d("ABC123","Tracks found - " + tracksFrequency.toString());
+                viewModel.getTracksNearby(currentMileRadius).observe(getViewLifecycleOwner(), tracksFrequency -> {
+                    List<CompletableFuture<Void>> searchFutures = new ArrayList<>();
+
+                    for (String key : tracksFrequency.keySet()) {
+                        CompletableFuture<Void> searchFuture = viewModel.searchTrack(key);
+                        searchFutures.add(searchFuture);
+                    }
+
+                    CompletableFuture<Void>[] searchFuturesArray = searchFutures.toArray(new CompletableFuture[0]);
+
+                    CompletableFuture<Void> allOf = CompletableFuture.allOf(searchFuturesArray);
+
+                    allOf.thenRun(() -> {
+                        ArrayList<PopularityTrack> popularityTracks = viewModel.getExploreTracks();
+                        Comparator<PopularityTrack> popularityComparator = Comparator.comparingInt(PopularityTrack::getRanking).reversed();
+                        Collections.sort(popularityTracks, popularityComparator);
+                        viewModel.setExploreTracks(new ArrayList<>());
+                        viewModel.setExploreTracks(popularityTracks);
+                        adapter.setExploreList(viewModel.getExploreTracks());
+                        adapter.notifyDataSetChanged();
+                    });
                 });
-
-            }
-
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                // TODO Auto-generated method stub
-            }
-
-            public void onStopTrackingTouch(SeekBar seekBar) {
-//                Toast.makeText(requireContext(), "Seek bar progress is :" + progressChangedValue,
-//                        Toast.LENGTH_SHORT).show();
             }
         });
 

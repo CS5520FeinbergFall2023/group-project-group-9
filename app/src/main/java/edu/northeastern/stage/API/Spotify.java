@@ -33,8 +33,10 @@ public class Spotify {
 
     // TODO: store CLIENT_ID and CLIENT_SECRET in FBDB
     private static final String TAG = "Spotify";
-    private static final String CLIENT_ID = "cdbc9d16da944c8dad47d543ed0741b2"; // store this somewhere else
-    private static final String CLIENT_SECRET = "d418779f7c994c6683bf27b1a35f141b"; // store this somewhere else
+//    private static final String CLIENT_ID = "cdbc9d16da944c8dad47d543ed0741b2"; // store this somewhere else
+//    private static final String CLIENT_SECRET = "d418779f7c994c6683bf27b1a35f141b"; // store this somewhere else
+    private static final String CLIENT_ID = "dac2479754b6411b8c911effe51ddf38"; // store this somewhere else
+    private static final String CLIENT_SECRET = "f7a878a61ad944eebfc847acfd099548"; // store this somewhere else
     private String accessToken = ""; // set default value
     private long tokenExpirationTime = 0; // set default value
 
