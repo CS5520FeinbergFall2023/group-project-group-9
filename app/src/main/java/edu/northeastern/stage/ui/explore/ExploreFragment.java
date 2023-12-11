@@ -140,7 +140,6 @@ public class ExploreFragment extends Fragment {
                         ArrayList<PopularityTrack> popularityTracks = viewModel.getExploreTracks();
                         Comparator<PopularityTrack> popularityComparator = Comparator.comparingInt(PopularityTrack::getRanking).reversed();
                         Collections.sort(popularityTracks, popularityComparator);
-                        viewModel.setExploreTracks(new ArrayList<>());
                         viewModel.setExploreTracks(popularityTracks);
                         adapter.setExploreList(viewModel.getExploreTracks());
                         adapter.notifyDataSetChanged();
