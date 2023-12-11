@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -48,6 +49,7 @@ public class ExploreFragment extends Fragment {
     private SharedDataViewModel sharedDataViewModel;
     private int currentMileRadius; // current value selected on slider bar.
     private TrackSearchAdapter searchAdapter;
+    private ProgressBar progressBar;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,6 +63,7 @@ public class ExploreFragment extends Fragment {
         actv.setThreshold(1);
         geoSlider = binding.locationSeekBar;
         progressTextView = binding.textView;
+        progressBar = binding.progressBar2;
 
         // set up view models to share data
         sharedDataViewModel = new ViewModelProvider(requireActivity()).get(SharedDataViewModel.class);
@@ -114,6 +117,7 @@ public class ExploreFragment extends Fragment {
             }
 
             public void onStopTrackingTouch(SeekBar seekBar) {
+                progressBar.setVisibility(View.VISIBLE);
 
                 viewModel.getTracksNearby(currentMileRadius).observe(getViewLifecycleOwner(),tracksFrequency -> {
                     Log.d("ABC123","Current mile radius: " + String.valueOf(currentMileRadius));
@@ -140,6 +144,7 @@ public class ExploreFragment extends Fragment {
                                 // Convert to list
                                 List<String> keyList = new ArrayList<>(keySet);
                                 viewModel.setCirclesWithTracks(keyList, binding.circleView);
+                                progressBar.setVisibility(View.GONE);
 
                                 binding.circleView.setCircleClickListener(clickedTrack -> {
                                     viewModel.setClickedTrack(clickedTrack);
@@ -151,7 +156,6 @@ public class ExploreFragment extends Fragment {
                         });
                     }
                 });
-
             }
         });
 
